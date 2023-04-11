@@ -1,23 +1,23 @@
 ---
 
-- name: Set worker var
-  set_fact:
-    worker: "{{ worker_type }}-{{ worker_index|default('0') }}"
+- name: Set worker variable
+  ansible.builtin.set_fact:
+    worker: "{{ worker_type }}-{{ worker_index | default('0') }}"
 
-- name: Put {{ worker }} config in place
-  template:
-    src: "worker.yaml.j2"
-    dest: "/etc/matrix-synapse/workers/{{ worker }}.yaml"
-    mode: '644'
-  notify: config worker services
+- name: Ensure config in place for {{ worker }}
+  ansible.builtin.template:
+    src: worker.yaml.j2
+    dest: /etc/matrix-synapse/workers/{{ worker }}.yaml
+    mode: 0644
+  notify: Config worker services
 
-- name: Put {{ worker }} logging config in place
-  template:
-    src: "log.yaml.j2"
-    dest: "/etc/matrix-synapse/worker-logs/{{ worker }}-log.yaml"
-    mode: '644'
-  notify: config worker services
+- name: Ensure logging config in place for {{ worker }}
+  ansible.builtin.template:
+    src: log.yaml.j2
+    dest: /etc/matrix-synapse/worker-logs/{{ worker }}-log.yaml
+    mode: 0644
+  notify: Config worker services
 
-- name: Add {{ worker }} to synapse_worker_services
-  set_fact:
-    synapse_worker_services: "{{ synapse_worker_services + [ worker ] }}"
+- name: Add worker to synapse_worker_services variable
+  ansible.builtin.set_fact:
+    synapse_worker_services: "{{ synapse_worker_services + [worker] }}"

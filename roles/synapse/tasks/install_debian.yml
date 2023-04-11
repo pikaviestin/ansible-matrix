@@ -1,7 +1,6 @@
 ---
-
-- name: Install dependencies
-  apt:
+- name: Ensure synapse dependencies are installed
+  ansible.builtin.apt:
     name:
       - lsb-release
       - wget
@@ -9,22 +8,26 @@
       - python3-pysaml2
       - python3-psycopg2
       - acl
+    state: present
 
-- name: Add matrix.org repo signing key
-  apt_key:
-    url: 'https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg'
-    id: 'AAF9AE843A7584B5A3E4CD2BCF45A512DE2DA058'
+- name: Ensure matrix.org repo signing key is trusted
+  ansible.builtin.apt_key:
+    url: https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg
+    id: AAF9AE843A7584B5A3E4CD2BCF45A512DE2DA058
+    state: present
 
-- name: Add matrix.org repo
-  apt_repository:
-    repo: "deb https://packages.matrix.org/debian/ {{ ansible_distribution_release }} main"
+- name: Ensure matrix.org repo is enabled
+  ansible.builtin.apt_repository:
+    repo: deb https://packages.matrix.org/debian/ {{ ansible_distribution_release }} main
+    state: present
 
-- name: Install synapse
-  apt:
+- name: Ensure synapse is installed
+  ansible.builtin.apt:
     name: matrix-synapse-py3
     state: latest
 
-- name: Install redis
-  apt:
+- name: Ensure redis in installed for workers
+  ansible.builtin.apt:
     name: redis-server
+    state: present
   when: synapse_workers is defined

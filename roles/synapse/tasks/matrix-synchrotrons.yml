@@ -1,65 +1,53 @@
 ---
 
-- block:
-  - name: Add backports
-    apt_repository:
-      repo: "deb http://deb.debian.org/debian/ buster-backports main"
-      filename: backports
-      mode: '644'
-  - name: Install go from backports
-    apt:
-      name: golang
-      default_release: buster-backports
-  when: ansible_distribution_release == 'buster'
-
 - name: Install git and golang
-  apt:
+  ansible.builtin.apt:
     name:
       - git
       - golang
 
 - name: Create matrix-synchrotron user
-  user:
+  ansible.builtin.user:
     name: matrix-synchrotron
-    system: yes
+    system: true
     home: /opt/matrix-synchrotron
     shell: /bin/false
 
-- block:
-  - name: Clone matrix-synchrotron git repo
-    git:
-      repo: 'https://github.com/Sorunome/matrix-synchrotron-balancer.git'
-      dest: /opt/matrix-synchrotron/src
-      force: yes
-    register: install
-
-  - name: Build matrix-synchrotron
-    command: go build
-    args:
-      chdir: /opt/matrix-synchrotron/src
-    when: install.changed
-    notify: config synapse service
-
-  - name: Configure matrix-synchrotron(s)
-    include_tasks: matrix-synchrotron.yml
-    loop: "{{ synapse_synchrotrons }}"
-    loop_control:
-      extended: yes
-
+- name: Install matrix-synchrotron
   become_user: matrix-synchrotron
+  block:
+    - name: Clone matrix-synchrotron git repo
+      ansible.builtin.git:
+        repo: https://github.com/Sorunome/matrix-synchrotron-balancer.git
+        dest: /opt/matrix-synchrotron/src
+        force: true
+      register: install
+
+    - name: Build matrix-synchrotron
+      ansible.builtin.command: go build
+      args:
+        chdir: /opt/matrix-synchrotron/src
+      when: install.changed
+      notify: Config synapse service
+
+    - name: Configure matrix-synchrotron(s)
+      ansible.builtin.include_tasks: matrix-synchrotron.yml
+      loop: "{{ synapse_synchrotrons }}"
+      loop_control:
+        extended: true
 
 - name: Put systemd matrix-synchrotron unit in place
-  template:
-    src: 'systemd/matrix-synchrotron@.service.j2'
-    dest: "/etc/systemd/system/matrix-synchrotron@.service"
-    mode: '644'
+  ansible.builtin.template:
+    src: systemd/matrix-synchrotron@.service.j2
+    dest: /etc/systemd/system/matrix-synchrotron@.service
+    mode: "644"
   register: systemd_unit
 
-- name: Enable systemd matrix-synchrotron-{{ item }} unit
-  systemd:
-    daemon_reload: yes
-    name: "matrix-synchrotron@{{ item }}.service"
-    enabled: yes
+- name: Enable systemd unit matrix-synchrotron-{{ item }}
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: matrix-synchrotron@{{ item }}.service
+    enabled: true
     state: restarted
   when: systemd_unit.changed
   loop: "{{ synapse_synchrotrons }}"

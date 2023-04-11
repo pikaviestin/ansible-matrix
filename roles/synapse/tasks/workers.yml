@@ -1,49 +1,52 @@
 ---
 
-- name: synapse-wide worker config
-  template:
-    src: 'conf.d/workers.yaml.j2'
-    dest: '/etc/matrix-synapse/conf.d/workers.yaml'
+- name: Ensure synapse-wide worker config in place
+  ansible.builtin.template:
+    src: conf.d/workers.yaml.j2
+    dest: /etc/matrix-synapse/conf.d/workers.yaml
+    mode: 0644
 
-- name: Put worker systemd unit in place
-  template:
-    src: "systemd/matrix-synapse-worker@.service.j2"
-    dest: '/etc/systemd/system/matrix-synapse-worker@.service'
-    mode: '644'
-  notify: config worker services
+- name: Ensure worker systemd unit in place
+  ansible.builtin.template:
+    src: systemd/matrix-synapse-worker@.service.j2
+    dest: /etc/systemd/system/matrix-synapse-worker@.service
+    mode: 0644
+  notify: Config worker services
 
-- name: Create workers config directories
-  file:
+- name: Ensure worker config directories exist
+  ansible.builtin.file:
     path: /etc/matrix-synapse/{{ item }}
     state: directory
+    mode: 0755
   loop:
     - workers
     - worker-logs
 
 - name: Initialize synapse worker vars
-  set_fact:
+  ansible.builtin.set_fact:
     synapse_worker_services: []
     synapse_synchrotrons: []
 
-- name: 'Create worker pidfile dir in /run'
-  file:
+- name: Ensure worker pidfile dir in /run exists
+  ansible.builtin.file:
     path: /run/matrix-synapse/
     state: directory
     owner: matrix-synapse
     group: nogroup
+    mode: 0755
 
-- name: Create tmpfiles config for pidfile dir in run
-  template:
-    src: 'tmpfiles-matrix-synapse.conf.j2'
-    dest: '/etc/tmpfiles.d/matrix-synapse.conf'
-    mode: '644'
+- name: Ensure tmpfiles config for pidfile dir in place
+  ansible.builtin.template:
+    src: tmpfiles-matrix-synapse.conf.j2
+    dest: /etc/tmpfiles.d/matrix-synapse.conf
+    mode: 0644
 
 - name: Configure workers
-  include_tasks: worker_type.yml
+  ansible.builtin.include_tasks: worker_type.yml
   loop: "{{ synapse_workers | dict2items }}"
   loop_control:
     loop_var: synapse_worker
 
 - name: Configure synchrotron balancer
-  include_tasks: matrix-synchrotrons.yml
+  ansible.builtin.include_tasks: matrix-synchrotrons.yml
   when: synapse_synchrotrons | length != 0
