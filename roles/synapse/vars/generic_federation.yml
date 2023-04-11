@@ -1,0 +1,4 @@
+---
+
+worker_listeners:
+  - federation

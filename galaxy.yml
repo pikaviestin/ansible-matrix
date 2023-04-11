@@ -1,0 +1,11 @@
+---
+
+namespace: uumas
+name: matrix
+description: Matrix roles
+version: 0.0.1
+readme: README.md
+repository: https://git.uumas.fi/uumas/ansible-matrix
+license_file: LICENSE
+authors:
+  - uumas

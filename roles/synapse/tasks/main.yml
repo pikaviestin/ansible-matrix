@@ -1,0 +1,38 @@
+---
+
+- name: Fail if not debian
+  fail:
+  when: ansible_os_family != "Debian"
+
+- name: Install synapse on debian
+  include_tasks: install_debian.yml
+  when: ansible_os_family=="Debian"
+
+- name: Synapse configuration
+  import_tasks: config.yml
+
+- name: Install matrix-synapse-shared-secret-auth
+  pip:
+    name: 'git+https://github.com/devture/matrix-synapse-shared-secret-auth'
+    state: latest
+    virtualenv: /opt/venvs/matrix-synapse
+  notify: config synapse service
+  when: synapse_shared_secret_auth is defined
+
+- name: Put systemd units in place
+  template:
+    src: "systemd/{{ item }}.j2"
+    dest: "/etc/systemd/system/{{ item }}"
+    mode: '644'
+  loop:
+    - matrix-synapse.service
+    - matrix.target
+  notify: 
+    - config synapse service
+    - config matrix target
+
+- name: Synapse workers
+  include_tasks: workers.yml
+  when: synapse_workers is defined
+
+- meta: flush_handlers

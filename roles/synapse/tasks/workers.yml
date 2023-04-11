@@ -1,0 +1,49 @@
+---
+
+- name: synapse-wide worker config
+  template:
+    src: 'conf.d/workers.yaml.j2'
+    dest: '/etc/matrix-synapse/conf.d/workers.yaml'
+
+- name: Put worker systemd unit in place
+  template:
+    src: "systemd/matrix-synapse-worker@.service.j2"
+    dest: '/etc/systemd/system/matrix-synapse-worker@.service'
+    mode: '644'
+  notify: config worker services
+
+- name: Create workers config directories
+  file:
+    path: /etc/matrix-synapse/{{ item }}
+    state: directory
+  loop:
+    - workers
+    - worker-logs
+
+- name: Initialize synapse worker vars
+  set_fact:
+    synapse_worker_services: []
+    synapse_synchrotrons: []
+
+- name: 'Create worker pidfile dir in /run'
+  file:
+    path: /run/matrix-synapse/
+    state: directory
+    owner: matrix-synapse
+    group: nogroup
+
+- name: Create tmpfiles config for pidfile dir in run
+  template:
+    src: 'tmpfiles-matrix-synapse.conf.j2'
+    dest: '/etc/tmpfiles.d/matrix-synapse.conf'
+    mode: '644'
+
+- name: Configure workers
+  include_tasks: worker_type.yml
+  loop: "{{ synapse_workers | dict2items }}"
+  loop_control:
+    loop_var: synapse_worker
+
+- name: Configure synchrotron balancer
+  include_tasks: matrix-synchrotrons.yml
+  when: synapse_synchrotrons | length != 0
