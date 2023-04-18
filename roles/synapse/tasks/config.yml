@@ -1,22 +1,45 @@
 ---
+
+- name: Ensure signing key permissions set correctly
+  ansible.builtin.file:
+    path: /etc/matrix-synapse/homeserver.signing.key
+    state: file
+    owner: matrix-synapse
+    group: nogroup
+    mode: 0600
+
 - name: Ensure synapse configs are in place
   ansible.builtin.template:
     src: conf.d/{{ item }}.yaml.j2
     dest: /etc/matrix-synapse/conf.d/{{ item }}.yaml
-    mode: "644"
+    owner: matrix-synapse
+    group: nogroup
+    mode: 0644
   loop:
-    - database
-    - general
     - listeners
     - server_name
     - url_preview
+  notify: Config matrix target
+
+- name: Ensure synapse configs including secrets is in place
+  ansible.builtin.template:
+    src: conf.d/{{ item }}.yaml.j2
+    dest: /etc/matrix-synapse/conf.d/{{ item }}.yaml
+    owner: matrix-synapse
+    group: nogroup
+    mode: 0600
+  loop:
+    - database
+    - general
   notify: Config matrix target
 
 - name: Ensure autojoin config is in place
   ansible.builtin.template:
     src: conf.d/autojoin.yaml.j2
     dest: /etc/matrix-synapse/conf.d/autojoin.yaml
-    mode: "644"
+    owner: matrix-synapse
+    group: nogroup
+    mode: 0644
   when: matrix_auto_join_rooms is defined
   notify: Config matrix target
 
@@ -24,7 +47,9 @@
   ansible.builtin.template:
     src: conf.d/password_providers.yaml.j2
     dest: /etc/matrix-synapse/conf.d/password_providers.yaml
-    mode: "644"
+    owner: matrix-synapse
+    group: nogroup
+    mode: 0644
   when: synapse_ldap_servers is defined
   notify: Config matrix target
 
@@ -32,7 +57,9 @@
   ansible.builtin.template:
     src: conf.d/modules.yaml.j2
     dest: /etc/matrix-synapse/conf.d/modules.yaml
-    mode: "644"
+    owner: matrix-synapse
+    group: nogroup
+    mode: 0600
   when: synapse_shared_secret_auth is defined
   notify: Config matrix target
 
@@ -40,7 +67,9 @@
   ansible.builtin.template:
     src: conf.d/sso.yaml.j2
     dest: /etc/matrix-synapse/conf.d/sso.yaml
-    mode: "644"
+    owner: matrix-synapse
+    group: nogroup
+    mode: 0644
   when: matrix_openidc_providers is defined
   notify: Config matrix target
 
@@ -48,6 +77,8 @@
   ansible.builtin.template:
     src: conf.d/turn.yaml.j2
     dest: /etc/matrix-synapse/conf.d/turn.yaml
-    mode: "644"
+    owner: matrix-synapse
+    group: nogroup
+    mode: 0644
   when: turn_domain is defined
   notify: Config matrix target
