@@ -1,4 +1,5 @@
 ---
+
 - name: Ensure synapse dependencies are installed
   ansible.builtin.apt:
     name:
