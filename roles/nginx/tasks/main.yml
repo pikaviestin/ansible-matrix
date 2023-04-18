@@ -1,0 +1,38 @@
+---
+
+- name: Ensure nginx installed
+  ansible.builtin.apt:
+    name: nginx
+    state: latest
+
+- name: Ensure nginx default config disabled
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: Reload nginx
+
+- name: Set up certbot
+  ansible.builtin.include_tasks: certbot.yml
+  when: nginx_certbot
+
+- name: Ensure nginx configs in place
+  ansible.builtin.template:
+    src: "conf/{{ item }}.conf.j2"
+    dest: "/etc/nginx/conf.d/{{ item }}.conf"
+    mode: 0644
+  loop: "{{ nginx_confs }}"
+  notify: Reload nginx
+
+- name: Ensure nginx main site configured
+  ansible.builtin.template:
+    src: "site.j2"
+    dest: "/etc/nginx/sites-available/main"
+    mode: 0644
+  notify: Reload nginx
+
+- name: Ensure nginx main site enabled
+  ansible.builtin.file:
+    src: "../sites-available/main"
+    dest: "/etc/nginx/sites-enabled/main"
+    state: link
+  notify: Reload nginx
