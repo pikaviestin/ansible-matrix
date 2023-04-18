@@ -1,0 +1,12 @@
+{% extends 'mautrix-bridge.yaml.j2' %}
+
+{% block backfill %}
+        invite_own_puppet: true
+        initial_thread_limit: 100
+        initial_nonthread_limit: 1000
+{% endblock %}
+
+{% block bridge %}
+    initial_chat_sync: 100
+{% endblock %}
+

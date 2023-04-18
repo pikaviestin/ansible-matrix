@@ -1,0 +1,18 @@
+---
+
+- name: Add apt key {{ item.repo }}
+  ansible.builtin.apt_key:
+    id: "{{ matrix_extra_repos[item.repo].key.id }}"
+    url: "{{ matrix_extra_repos[item.repo].key.url }}"
+  when: matrix_extra_repos[item.repo].key is defined
+
+- name: Add repo {{ item.repo }}
+  ansible.builtin.apt_repository:
+    repo: "{{ matrix_extra_repos[item.repo].repo }}"
+    filename: "{{ item.repo }}"
+    mode: '644'
+
+- name: Install dependencies from {{ item.repo }}
+  ansible.builtin.apt:
+    name: "{{ item.packages }}"
+    default_release: "{{ matrix_extra_repos[item.repo].default_release | default(omit) }}"

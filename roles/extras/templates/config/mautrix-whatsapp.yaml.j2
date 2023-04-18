@@ -1,0 +1,83 @@
+# {{ ansible_managed }}
+
+homeserver:
+    address: http://localhost:8009
+    domain: {{ matrix_domain }}
+
+appservice:
+    address: http://localhost:29318
+    hostname: localhost
+    port: 29318
+
+    database:
+        type: postgres
+        uri: postgres://{{ psql_dbs['mautrix-whatsapp']['user'] }}:{{ psql_dbs['mautrix-whatsapp']['password']|urlencode() }}@localhost/mautrix-whatsapp
+
+    id: whatsapp
+
+    bot:
+        username: whatsappbot
+        displayname: WhatsApp {{ matrix_bridge_name_suffix }}
+
+    ephemeral_events: {{ matrix_bridge_ephemeral_events }}
+
+whatsapp:
+    os_name: {{ mautrix_whatsapp_web_name }}
+
+bridge:
+    username_template: whatsapp_{{ '{{.}}' }}
+    personal_filtering_spaces: true
+    delivery_receipts: true
+    # Should polls be sent using MSC3381 event types?
+    extev_polls: true
+    
+
+    history_sync:
+        backfill: true
+        request_full_sync: true
+
+    sync_with_custom_puppets: {{ not matrix_bridge_ephemeral_events }}
+    sync_direct_chat_list: true
+
+    double_puppet_server_map:
+        {{ matrix_domain }}: {{ matrix_external_url }}
+    double_puppet_allow_discovery: true
+# FIXME Support other_homeservers
+
+    login_shared_secret_map:
+        {{ matrix_domain }}: "{{ synapse_shared_secret_auth }}"
+# FIXME support other servers
+{% if matrix_extra_other_homeserver_shared_secret_auth is defined %}
+{% for item in matrix_extra_other_homeserver_shared_secret_auth | dict2items %}
+        {{ item.key }}: "{{ item.value }}"
+{% endfor %}
+{% endif %}
+
+    allow_user_invite: true
+    url_previews: true
+
+    encryption:
+        allow: true
+        default: false
+
+    provisioning:
+        prefix: /_matrix/provision
+        shared_secret: disable
+
+    permissions:
+        "*": relay
+        "{{ matrix_domain }}": user
+{% if matrix_bridge_other_homeservers is defined %}
+{% for item in matrix_bridge_other_homeservers %}
+        "{{ item }}": user
+{% endfor %}
+{% endif %}
+{% if matrix_bridge_admins is defined %}
+{% for item in matrix_bridge_admins %}
+        "{{ item }}": admin
+{% endfor %}
+{% endif %}
+
+    relay:
+        enabled: true
+

@@ -1,0 +1,35 @@
+---
+
+depends: "{{ python_depends }}"
+
+matrix_extra_tasks:
+  - pip
+  - appservice
+
+pip_packages:
+  - 'mautrix-telegram[all]'
+
+registrationgen_exec: >
+  {{ matrix_extra_workdir }}/bin/python -m mautrix_telegram
+  -g
+  -r '{{ matrix_extra_workdir }}/appservice-registration.yaml'
+  -c '{{ matrix_extra_workdir }}/config.yaml'
+exec: >
+  {{ matrix_extra_workdir }}/bin/python -m mautrix_telegram
+  -c {{ matrix_extra_workdir }}/config.yaml
+
+mautrix_port: 29317
+mautrix_loggers:
+  - mau
+  - telethon
+  - aiohttp
+mautrix_blocks:
+  - public
+  - provisioning
+  - delivery_error_reports
+  - displayname_template
+  - backfill
+mautrix_permissions:
+  relay: relaybot
+  user: full
+  admin: admin

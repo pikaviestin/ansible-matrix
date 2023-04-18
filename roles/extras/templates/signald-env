@@ -1,0 +1,3 @@
+SIGNALD_TRUST_ALL_KEYS=true
+SIGNALD_TRUST_NEW_KEYS=true
+SIGNALD_DATABASE=postgresql://{{ psql_dbs['signald']['user'] }}:{{ psql_dbs['signald']['password']|urlencode() }}@localhost/signald

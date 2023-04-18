@@ -1,0 +1,63 @@
+---
+
+- name: Include defaults
+  ansible.builtin.include_vars: defaults.yml
+- name: Include variables for {{ matrix_extra }}
+  ansible.builtin.include_vars: "{{ matrix_extra }}.yml"
+
+- name: Install dependencies for {{ matrix_extra }}
+  ansible.builtin.apt:
+    name: "{{ depends }}"
+    state: latest
+
+- name: Install dependencies from custom repos for {{ matrix_extra }}
+  ansible.builtin.include_tasks: repo.yml
+  when: repo_depends is defined
+  loop: "{{ repo_depends }}"
+
+- name: Create user for {{ matrix_extra }}
+  ansible.builtin.user:
+    name: "{{ matrix_extra }}"
+    system: true
+    home: /opt/{{ matrix_extra }}
+    shell: /bin/false
+
+- name: Configure {{ matrix_extra }}
+  become_user: "{{ matrix_extra }}"
+  block:
+    - name: Put config in place for {{ matrix_extra }}
+      ansible.builtin.template:
+        src: "config/{{ matrix_extra }}.yaml.j2"
+        dest: "/opt/{{ matrix_extra }}/config.yaml.ansibled"
+        mode: 0644
+        backup: true
+      notify: Restart matrix target
+      register: config
+    - name: Put config in final destination for {{ matrix_extra }}
+      ansible.builtin.copy:
+        src: "/opt/{{ matrix_extra }}/config.yaml.ansibled"
+        dest: "/opt/{{ matrix_extra }}/config.yaml"
+        mode: 0644
+        remote_src: true
+      when: config.changed
+
+    - name: Include service-specific tasks
+      ansible.builtin.include_tasks: "{{ tasks }}.yml"
+      loop: "{{ matrix_extra_tasks }}"
+      loop_control:
+        loop_var: tasks
+
+- name: Put systemd unit in place for {{ matrix_extra }}
+  ansible.builtin.template:
+    src: 'matrix-extra.service'
+    dest: "/etc/systemd/system/{{ matrix_extra }}.service"
+    mode: 0644
+  register: systemd_unit
+
+- name: Enable systemd unit {{ matrix_extra }}
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: "{{ matrix_extra }}.service"
+    enabled: true
+    state: restarted
+  when: systemd_unit.changed

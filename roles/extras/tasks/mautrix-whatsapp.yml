@@ -1,0 +1,15 @@
+---
+
+- name: Install latest mautrix-whatsapp release from github releases
+  ansible.builtin.get_url:
+    url: 'https://github.com/mautrix/whatsapp/releases/latest/download/mautrix-whatsapp-amd64'
+    dest: "/opt/mautrix-whatsapp/mautrix-whatsapp"
+    mode: '755'
+
+- name: Include appservice tasks
+  ansible.builtin.import_tasks: appservice.yml
+
+- name: Chmod registration file
+  ansible.builtin.file:
+    path: /opt/mautrix-whatsapp/appservice-registration.yaml
+    mode: '0644'

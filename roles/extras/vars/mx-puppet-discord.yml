@@ -1,0 +1,17 @@
+---
+
+depends:
+  - git
+  - nodejs
+  - npm
+  - yarnpkg
+
+matrix_extra_tasks:
+  - npm
+  - appservice
+
+matrix_extra_git_repo: 'https://gitlab.com/mx-puppet/discord/mx-puppet-discord.git'
+matrix_extra_workdir: /opt/{{ matrix_extra }}/src
+
+registrationgen_exec: "npm run start -- -r -f '/opt/{{ matrix_extra }}/appservice-registration.yaml' -c '/opt/{{ matrix_extra }}/config.yaml'"
+exec: "npm run start -- -f '/opt/{{ matrix_extra }}/appservice-registration.yaml' -c '/opt/{{ matrix_extra }}/config.yaml'"

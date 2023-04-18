@@ -1,0 +1,30 @@
+---
+
+depends: "{{ python_depends }}"
+
+matrix_extra_tasks:
+  - pip
+  - appservice
+
+pip_packages:
+  - 'mautrix-facebook[all]'
+
+registrationgen_exec: >
+  {{ matrix_extra_workdir }}/bin/python -m mautrix_facebook
+  -g
+  -r '{{ matrix_extra_workdir }}/appservice-registration.yaml'
+  -c '{{ matrix_extra_workdir }}/config.yaml'
+exec: >
+  {{ matrix_extra_workdir }}/bin/python -m mautrix_facebook
+  -c {{ matrix_extra_workdir }}/config.yaml
+
+
+mautrix_port: 29319
+mautrix_loggers:
+  - mau
+  - paho
+  - aiohttp
+mautrix_blocks:
+  - public
+  - backfill
+  - displayname_template

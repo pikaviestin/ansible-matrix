@@ -1,0 +1,14 @@
+# {{ ansible_managed }}
+database: postgres://{{ psql_dbs['maubot']['user'] }}:{{ psql_dbs['maubot']['password']|urlencode() }}@localhost/maubot
+server:
+    hostname: localhost
+    public_url: {{ matrix_external_url }}
+
+homeservers:
+    {{ matrix_domain }}:
+        url: http://localhost:8009
+        secret: {{ matrix_registration_shared_secret }}
+
+admins:
+    {{ maubot_admin_user }}: {{ maubot_admin_password }}
+

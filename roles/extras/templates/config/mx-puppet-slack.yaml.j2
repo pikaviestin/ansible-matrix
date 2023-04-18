@@ -1,0 +1,84 @@
+# {{ ansible_managed }}
+bridge:
+  port: 8432
+  bindAddress: localhost
+
+  domain: {{ matrix_domain }}
+  homeserverUrl: http://localhost:8009
+
+# FIXME Support other_homeservers
+  loginSharedSecretMap: 
+    {{ matrix_domain }}: "{{ synapse_shared_secret_auth }}" 
+
+  displayname: Slack {{ matrix_bridge_name_suffix }}
+  avatarUrl: {{ slack_avatar_url }}
+
+  enableGroupSync: true
+
+# Slack OAuth settings. Create a slack app at https://api.slack.com/apps
+oauth:
+  enabled: true
+  # Slack app credentials.
+  # N.B. This must be quoted so YAML wouldn't parse it as a float.
+  clientId: "{{ matrix_slack_oauth_client_id }}"
+  clientSecret: {{ matrix_slack_oauth_client_secret }}
+  redirectPath: {{ nginx_upstreams.mx_puppet_slack.locations[0].name }}/oauth
+  redirectUri: {{ matrix_external_url }}{{ nginx_upstreams.mx_puppet_slack.locations[0].name }}/oauth
+
+presence:
+  enabled: {{ synapse_presence }}
+  interval: 500
+
+provisioning:
+  whitelist:
+    - "@.*:{{ matrix_domain | replace(".", "\\\\.") }}"
+{% if matrix_bridge_other_homeservers is defined %}
+{% for item in matrix_bridge_other_homeservers %}
+    - "@.*:{{ item | replace(".", "\\\\.") }}"
+{% endfor %}
+{% endif %}
+
+  #blacklist:
+
+  # Shared secret for the provisioning API for use by integration managers.
+  # If this is not set, the provisioning API will not be enabled.
+  #sharedSecret: random string
+  # Path prefix for the provisioning API. /v1 will be appended to the prefix automatically.
+  apiPrefix: /_matrix/provision
+
+relay:
+  whitelist:
+    - ".*"
+
+  #blacklist:
+
+homeserverUrlMap:
+  {{ matrix_domain }}: http://localhost:8009
+
+database:
+  connString: "postgres://{{ psql_dbs['mx-puppet-slack']['user'] }}:{{ psql_dbs['mx-puppet-slack']['password']|urlencode() }}@localhost/mx-puppet-slack"
+
+namePatterns:
+  user: :name
+  room: :name
+  group: :name
+
+#FIXME: do metrics
+metrics:
+  # If enabled, the metrics are served at http://localhost:$port$path
+  enabled: false
+  # On which port the prometheus metrics will be served
+  port: 8000
+  # Path on which the metrics are available, the default is /metrics
+  path: "/metrics"
+
+logging:
+  # silly, verbose, info, warn, error
+  console: info
+  lineDateFormat: MMM-D HH:mm:ss.SSS
+  files:
+    - file: "bridge.log"
+      level: info
+      datePattern: YYYY-MM-DD
+      maxFiles: 14d
+      maxSize: 50m

@@ -1,0 +1,34 @@
+---
+
+depends: "{{ python_depends }}"
+repo_depends:
+  - repo: signald
+    packages:
+      - signald
+
+matrix_extra_tasks:
+  - signald
+  - pip
+  - appservice
+
+pip_packages:
+  - 'mautrix-signal[all]'
+
+registrationgen_exec: >
+  {{ matrix_extra_workdir }}/bin/python -m mautrix_signal
+  -g
+  -r '{{ matrix_extra_workdir }}/appservice-registration.yaml'
+  -c '{{ matrix_extra_workdir }}/config.yaml'
+exec: >
+  {{ matrix_extra_workdir }}/bin/python -m mautrix_signal
+  -c {{ matrix_extra_workdir }}/config.yaml
+
+mautrix_port: 29328
+mautrix_loggers:
+  - mau
+  - aiohttp
+mautrix_blocks:
+  - relay
+  - delivery_error_reports
+  - displayname_template
+mautrix_default_encrypt: true

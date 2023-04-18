@@ -1,0 +1,12 @@
+---
+
+- name: Install common dependencies for matrix-extras
+  ansible.builtin.apt:
+    name:
+      - libolm-dev
+
+- name: Include general tasks for each extra
+  ansible.builtin.include_tasks: general.yml
+  loop: "{{ matrix_extras }}"
+  loop_control:
+    loop_var: matrix_extra

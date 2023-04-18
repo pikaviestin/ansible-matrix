@@ -1,0 +1,11 @@
+---
+
+- name: Install {{ matrix_extra }}
+  ansible.builtin.pip:
+    chdir: '/opt/{{ matrix_extra }}'
+    name: "{{ pip_packages }}"
+    state: latest
+    virtualenv: "/opt/{{ matrix_extra }}"
+    virtualenv_python: '/usr/bin/python3'
+  register: install
+  notify: Restart matrix target

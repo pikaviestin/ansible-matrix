@@ -1,0 +1,15 @@
+---
+
+depends: "{{ python_depends }}"
+
+matrix_extra_tasks:
+  - pip
+  - maubot
+
+pip_packages:
+  - maubot
+  - psycopg2
+
+exec: '{{ matrix_extra_workdir }}/bin/python3 -m maubot -c {{ matrix_extra_workdir }}/config.yaml'
+
+matrix_extra_wait_before_start: true

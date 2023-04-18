@@ -1,0 +1,11 @@
+---
+
+- name: Restart synapse
+  ansible.builtin.systemd:
+    name: matrix-synapse.service
+    state: restarted
+
+- name: Restart matrix target
+  ansible.builtin.systemd:
+    name: matrix.target
+    state: restarted

@@ -1,0 +1,29 @@
+---
+
+- name: Generate registration file for {{ matrix_extra }}
+  ansible.builtin.command: "{{ registrationgen_exec }}"
+  args:
+    chdir: "{{ matrix_extra_workdir }}"
+  notify: Restart matrix target
+  when: config.changed or install.changed
+  become_user: "{{ matrix_extra }}"
+
+- name: Add appservice to synapse config - {{ matrix_extra }}
+  become_user: root
+  block:
+    - name: Ensure appservice config file present
+      ansible.builtin.lineinfile:
+        path: /etc/matrix-synapse/conf.d/appservice.yaml
+        line: 'app_service_config_files:'
+        regexp: '^app_service_config_files: *?$'
+        create: true
+        mode: 0644
+        insertbefore: BOF
+      notify: Restart synapse
+
+    - name: Configure appservice {{ matrix_extra }}
+      ansible.builtin.lineinfile:
+        path: '/etc/matrix-synapse/conf.d/appservice.yaml'
+        line: "  - '/opt/{{ matrix_extra }}/appservice-registration.yaml'"
+        regexp: '^.*{{ matrix_extra }}.*$'
+      notify: Restart synapse

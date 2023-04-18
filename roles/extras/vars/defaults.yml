@@ -1,0 +1,11 @@
+---
+
+matrix_extra_wait_before_start: false
+matrix_extra_workdir: /opt/{{ matrix_extra }}
+
+mautrix_permissions:
+  relay: relay
+  user: user
+  admin: admin
+mautrix_blocks: []
+mautrix_default_encrypt: false

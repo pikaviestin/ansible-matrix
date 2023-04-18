@@ -1,0 +1,31 @@
+{% extends 'mautrix-bridge.yaml.j2' %}
+
+{% block backfill %}
+{{ super() }}
+        normal_groups: true
+{% endblock %}
+
+{% block bridge %}
+    invite_link_resolve: true
+    max_document_size: {{ matrix_max_upload_size_mb }}
+
+    bridge_notices:
+        default: true
+ 
+    relay_user_distinguishers: []
+ 
+    state_event_formats:
+        join: ''
+        leave: ''
+
+    sync_channel_members: true
+    public_portals: true
+
+{% endblock %}
+
+{% block additional %}
+telegram:
+    api_id: {{ matrix_telegram_api_id }}
+    api_hash: {{ matrix_telegram_api_hash }}
+    bot_token: {{ matrix_telegram_bot_token }}
+{% endblock %}
