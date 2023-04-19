@@ -9,10 +9,6 @@ matrix_max_upload_size_mb: 100
 synapse_metrics: false
 synapse_presence: true
 
-synchrotron_workers:
-  balancer: generic_sync
-  init: generic_init_sync
-
 persister_workers:
   - event_persister
   - typing_persister

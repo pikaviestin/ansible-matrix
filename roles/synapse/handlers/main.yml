@@ -21,3 +21,10 @@
     enabled: true
   loop: "{{ synapse_worker_services }}"
   notify: Config matrix target
+
+- name: Disable matrix-synchrotrons
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: matrix-synchrotron@{{ item }}.service
+    enabled: false
+  loop: "{{ synapse_synchrotrons }}"

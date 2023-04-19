@@ -47,6 +47,6 @@
   loop_control:
     loop_var: synapse_worker
 
-- name: Configure synchrotron balancer
+- name: Ensure synchrotron balancer removed (legacy)
   ansible.builtin.include_tasks: matrix-synchrotrons.yml
   when: synapse_synchrotrons | length != 0
