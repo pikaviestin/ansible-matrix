@@ -27,25 +27,21 @@
     synapse_worker_services: []
     synapse_synchrotrons: []
 
-- name: Ensure worker pidfile dir in /run exists
-  ansible.builtin.file:
-    path: /run/matrix-synapse/
-    state: directory
-    owner: matrix-synapse
-    group: nogroup
-    mode: 0755
-
-- name: Ensure tmpfiles config for pidfile dir in place
-  ansible.builtin.template:
-    src: tmpfiles-matrix-synapse.conf.j2
-    dest: /etc/tmpfiles.d/matrix-synapse.conf
-    mode: 0644
-
 - name: Configure workers
   ansible.builtin.include_tasks: worker_type.yml
   loop: "{{ synapse_workers | dict2items }}"
   loop_control:
     loop_var: synapse_worker
+
+- name: Ensure worker pidfile dir in /run not present (legacy)
+  ansible.builtin.file:
+    path: /run/matrix-synapse/
+    state: absent
+
+- name: Ensure tmpfiles config for pidfile dir not present (legacy)
+  ansible.builtin.file:
+    path: /etc/tmpfiles.d/matrix-synapse.conf
+    state: absent
 
 - name: Ensure synchrotron balancer removed (legacy)
   ansible.builtin.include_tasks: matrix-synchrotrons.yml
