@@ -4,7 +4,7 @@
 - name: Synapse
   hosts: matrix_synapse
   become: true
-  vars_files: 
+  vars_files:
     - vars/nginx.yml
   roles:
     - synapse
