@@ -25,7 +25,6 @@
 - name: Initialize synapse worker vars
   ansible.builtin.set_fact:
     synapse_worker_services: []
-    synapse_synchrotrons: []
 
 - name: Configure workers
   ansible.builtin.include_tasks: worker_type.yml
@@ -45,4 +44,3 @@
 
 - name: Ensure synchrotron balancer removed (legacy)
   ansible.builtin.include_tasks: matrix-synchrotrons.yml
-  when: synapse_synchrotrons | length != 0

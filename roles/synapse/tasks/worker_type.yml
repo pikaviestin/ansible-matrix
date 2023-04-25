@@ -33,8 +33,3 @@
 - name: Include worker instance tasks for {{ worker_type }}
   ansible.builtin.include_tasks: worker_instance.yml
   when: worker_ports|length == 0
-
-- name: Append synchrotron variable
-  ansible.builtin.set_fact:
-    synapse_synchrotrons: "{{ synapse_synchrotrons + [synchrotron_type] }}"
-  when: synchrotron_type is defined and synchrotron_type not in synapse_synchrotrons
