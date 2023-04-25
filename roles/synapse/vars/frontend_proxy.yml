@@ -1,3 +1,4 @@
 ---
 
-worker_app: frontend_proxy
+# LEGACY
+worker_state: absent

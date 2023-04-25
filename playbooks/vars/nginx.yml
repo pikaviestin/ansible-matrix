@@ -60,6 +60,7 @@ nginx_upstreams:
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/keys/changes$'
       - name: '~ ^/_matrix/client/(r0|v3|unstable)/keys/claim$'
       - name: '~ ^/_matrix/client/(r0|v3|unstable)/room_keys/'
+      - name: '~ ^/_matrix/client/(r0|v3|unstable)/keys/upload/'
   synapse_generic_login:
     servers: "{{ synapse_workers.generic_login | default('') }}"
     locations:
@@ -128,11 +129,6 @@ nginx_upstreams:
     servers: "{{ synapse_workers.user_dir | default('') }}"
     locations:
       - name: '~ ^/_matrix/client/(r0|v3|unstable)/user_directory/search$'
-  synapse_frontend_proxy:
-    servers: "{{ synapse_workers.frontend_proxy | default('') }}"
-    locations:
-      - name: '~ ^/_matrix/client/(r0|v3|unstable)/keys/upload'
-      - name: "{{ '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/presence/[^/]+/status' if synapse_presence is defined and not synapse_presence else '' }}"
   synapse_media_repository:
     servers: "{{ synapse_workers.media_repository | default('') }}"
     locations:
@@ -245,7 +241,6 @@ nginx_servers:
       - synapse_generic_event_send
       - synapse_generic_pagination
       - synapse_user_dir
-      - synapse_frontend_proxy
       - synapse_device_persister
       - synapse_typing_persister
       - synapse_account_persister

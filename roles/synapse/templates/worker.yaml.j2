@@ -24,6 +24,3 @@ worker_listeners:
     bind_addresses: ['0.0.0.0'] # Don't bind to multiple addresses
 {% endif %}
 {% endif %}
-{% if worker_app == 'frontend_proxy' %}
-worker_main_http_uri: http://localhost:8008
-{% endif %}
