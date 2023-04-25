@@ -4,20 +4,44 @@
   ansible.builtin.set_fact:
     worker: "{{ worker_type }}-{{ worker_index | default('0') }}"
 
-- name: Ensure config in place for {{ worker }}
-  ansible.builtin.template:
-    src: worker.yaml.j2
-    dest: /etc/matrix-synapse/workers/{{ worker }}.yaml
-    mode: 0644
-  notify: Config worker services
+- name: Enable worker {{ worker }}
+  when: worker_state == 'present'
+  block:
+    - name: Ensure config in place for {{ worker }}
+      ansible.builtin.template:
+        src: worker.yaml.j2
+        dest: /etc/matrix-synapse/workers/{{ worker }}.yaml
+        mode: 0644
+      notify: Config worker services
 
-- name: Ensure logging config in place for {{ worker }}
-  ansible.builtin.template:
-    src: log.yaml.j2
-    dest: /etc/matrix-synapse/worker-logs/{{ worker }}-log.yaml
-    mode: 0644
-  notify: Config worker services
+    - name: Ensure logging config in place for {{ worker }}
+      ansible.builtin.template:
+        src: log.yaml.j2
+        dest: /etc/matrix-synapse/worker-logs/{{ worker }}-log.yaml
+        mode: 0644
+      notify: Config worker services
 
-- name: Add worker to synapse_worker_services variable
-  ansible.builtin.set_fact:
-    synapse_worker_services: "{{ synapse_worker_services + [worker] }}"
+    - name: Add worker to synapse_worker_services variable
+      ansible.builtin.set_fact:
+        synapse_worker_services: "{{ synapse_worker_services + [worker] }}"
+
+
+- name: Disable worker {{ worker }}
+  when: worker_state == 'absent'
+  block:
+    - name: Notify the user
+      ansible.builtin.debug:
+        msg: "Disabling worker {{ worker }}! Make sure to remove it from your synapse_workers."
+
+    - name: Ensure worker config files not present
+      ansible.builtin.file:
+        path: /etc/matrix-synapse/{{ item }}.yaml
+        state: absent
+      notify: Disable worker services
+      loop:
+        - workers/{{ worker }}
+        - worker-logs/{{ worker }}-log
+
+    - name: Add worker to synapse_disable_worker_services
+      ansible.builtin.set_fact:
+        synapse_disable_worker_services: "{{ synapse_worker_services + [worker] }}"

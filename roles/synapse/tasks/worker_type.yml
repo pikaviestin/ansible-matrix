@@ -14,6 +14,11 @@
         - "{{ worker_type }}.yml"
       skip: true
 
+- name: Warn of legacy workers
+  ansible.builtin.debug:
+    msg: "You have a deprecated worker type {{ worker_type }} defined. You should remove it from synapse_workers."
+  when: worker_state == 'absent'
+
 - name: Reset worker_ports variable
   ansible.builtin.set_fact:
     worker_ports: []
