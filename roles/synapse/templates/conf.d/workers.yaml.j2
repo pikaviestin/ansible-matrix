@@ -6,7 +6,10 @@ redis:
 notify_appservices_from_worker: appservice-0
 {% endif %}
 {% if 'pusher' in synapse_workers %}
-start_pushers: false
+pusher_instances:
+{% for port in synapse_workers.pusher %}
+  - pusher-{{ loop.index0 }}
+{% endfor %}
 {% endif %}
 {% if 'user_dir' in synapse_workers %}
 update_user_directory_from_worker: user_dir-0
@@ -78,13 +81,8 @@ run_background_tasks_on: background_tasks-0
 {% endif %}
 
 {% if 'federation_sender' in synapse_workers %}
-send_federation: false
-
-{% if synapse_workers.federation_sender|length > 1 %}
 federation_sender_instances:
 {% for port in synapse_workers.federation_sender %}
   - federation_sender-{{ loop.index0 }}
 {% endfor %}
-{% endif %}
-
 {% endif %}
