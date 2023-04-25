@@ -1,5 +1,6 @@
 ---
 
+# Worker endpoints last updated on 2023-04-25
 nginx_upstreams:
   synapse_main:
     servers:
@@ -43,6 +44,8 @@ nginx_upstreams:
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/members$'
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/state$'
       - name: '~ ^/_matrix/client/v1/rooms/.*/hierarchy$'
+      - name: '~ ^/_matrix/client/(v1|unstable)/rooms/.*/relations/'
+      - name: '~ ^/_matrix/client/v1/rooms/.*/threads$'
       - name: '~ ^/_matrix/client/unstable/org.matrix.msc2716/rooms/.*/batch_send$'
       - name: '~ ^/_matrix/client/unstable/im.nheko.summary/rooms/.*/summary$'
       - name: '~ ^/_matrix/client/(r0|v3|unstable)/account/3pid$'
@@ -52,7 +55,12 @@ nginx_upstreams:
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/voip/turnServer$'
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/event/'
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/joined_rooms$'
+      - name: '~ ^/_matrix/client/v1/rooms/.*/timestamp_to_event$'
+      - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable/.*)/rooms/.*/aliases'
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/search$'
+      - name: '~ ^/_matrix/client/(r0|v3|unstable)/user/.*/filter(/|$)'
+      - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/directory/room/.*$'
+      - name: '~ ^/_matrix/client/(r0|v3|unstable)/capabilities$'
 
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/keys/query$'
         additional_options:
@@ -66,7 +74,9 @@ nginx_upstreams:
     locations:
       - name: '~ ^/_matrix/client/(api/v1|r0|unstable|v3)/login$'
       - name: '~ ^/_matrix/client/(r0|unstable|v3)/register$'
+      - name: '~ ^/_matrix/client/(r0|v3|unstable)/register/available$'
       - name: '~ ^/_matrix/client/v1/register/m.login.registration_token/validity$'
+      - name: '~ ^/_matrix/client/(r0|v3|unstable)/password_policy$'
       # SSO
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/login/sso/redirect'
       - name: '~ ^/_synapse/client/pick_idp$'
@@ -97,6 +107,7 @@ nginx_upstreams:
       - name: '~ ^/_matrix/federation/(v1|v2)/send_leave/'
       - name: '~ ^/_matrix/federation/(v1|v2)/invite/'
       - name: '~ ^/_matrix/federation/v1/event_auth/'
+      - name: '~ ^/_matrix/federation/v1/timestamp_to_event/'
       - name: '~ ^/_matrix/federation/v1/exchange_third_party_invite/'
       - name: '~ ^/_matrix/federation/v1/user/devices/'
       - name: '~ ^/_matrix/key/v2/query'
@@ -119,6 +130,7 @@ nginx_upstreams:
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/join/'
         additional_options:
           - 'proxy_read_timeout 1h'
+      - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/knock/'
       - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/profile/'
   synapse_generic_pagination:
     servers: "{{ synapse_workers.generic_pagination | default('') }}"
