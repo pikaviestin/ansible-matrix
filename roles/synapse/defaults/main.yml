@@ -8,11 +8,3 @@ synapse_psql_db: "{{ synapse_psql_user }}"
 matrix_max_upload_size_mb: 100
 synapse_metrics: false
 synapse_presence: true
-
-persister_workers:
-  - event_persister
-  - typing_persister
-  - account_persister
-  - device_persister
-  - presence_persister
-  - receipt_persister

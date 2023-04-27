@@ -1,0 +1,9 @@
+---
+
+persister_workers:
+  - event_persister
+  - typing_persister
+  - account_persister
+  - device_persister
+  - presence_persister
+  - receipt_persister
