@@ -5,13 +5,13 @@
     worker_type: "{{ synapse_worker.key }}"
 
 - name: Include default variables
-  ansible.builtin.include_vars: defaults.yml
+  ansible.builtin.include_vars: workers/defaults.yml
 
 - name: Include variables for {{ worker_type }}
   ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - files:
-        - "{{ worker_type }}.yml"
+        - "workers/{{ worker_type }}.yml"
       skip: true
 
 - name: Warn of legacy workers
