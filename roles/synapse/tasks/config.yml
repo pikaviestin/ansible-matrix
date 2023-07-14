@@ -29,6 +29,7 @@
     - listeners
     - server_name
     - url_preview
+    - autojoin
   notify: Config matrix target
 
 - name: Ensure synapse configs including secrets is in place
@@ -41,16 +42,6 @@
   loop:
     - database
     - general
-  notify: Config matrix target
-
-- name: Ensure autojoin config is in place
-  ansible.builtin.template:
-    src: conf.d/autojoin.yaml.j2
-    dest: /etc/matrix-synapse/conf.d/autojoin.yaml
-    owner: matrix-synapse
-    group: nogroup
-    mode: 0644
-  when: matrix_auto_join_rooms is defined
   notify: Config matrix target
 
 - name: Ensure password provider config is in place

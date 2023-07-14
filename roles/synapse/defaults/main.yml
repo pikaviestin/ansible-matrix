@@ -8,3 +8,5 @@ synapse_psql_db: "{{ synapse_psql_user }}"
 matrix_max_upload_size_mb: 100
 synapse_metrics: false
 synapse_presence: true
+
+matrix_auto_join_rooms: []
