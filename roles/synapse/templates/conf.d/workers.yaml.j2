@@ -18,9 +18,11 @@ update_user_directory_from_worker: user_dir-0
 
 {% if 'event_persister' in synapse_workers or 'typing_persister' in synapse_workers or 'account_persister' in synapse_workers or 'device_persister' in synapse_workers or 'presence_persister' in synapse_workers or 'receipt_persister' in synapse_workers %}
 instance_map:
+  main:
+    host: localhost
+    port: 9093
 
 {% for persister_type in persister_workers %}
-
 {% if persister_type in synapse_workers %}
 {% for port in synapse_workers[persister_type] %}
   {{ persister_type }}-{{ loop.index0 }}:
@@ -28,7 +30,6 @@ instance_map:
     port: {{ port }}
 {% endfor %}
 {% endif %}
-
 {% endfor %}
 
 stream_writers:

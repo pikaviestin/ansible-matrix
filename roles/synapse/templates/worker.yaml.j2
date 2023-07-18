@@ -2,10 +2,6 @@
 worker_app: synapse.app.{{ worker_app }}
 worker_name: {{ worker }}
 
-# The replication listener on the synapse to talk to.
-worker_replication_host: 127.0.0.1
-worker_replication_http_port: 9093
-
 worker_log_config: /etc/matrix-synapse/worker-logs/{{ worker }}-log.yaml
 {% if worker_port is defined and worker_listeners|length !=0 or synapse_metrics %}
 worker_listeners:
