@@ -1,6 +1,6 @@
 ---
 
-# Worker endpoints last updated on 2023-04-25
+# Worker endpoints last updated on 2023-07-18
 nginx_upstreams:
   synapse_main:
     servers:
@@ -46,7 +46,6 @@ nginx_upstreams:
       - name: '~ ^/_matrix/client/v1/rooms/.*/hierarchy$'
       - name: '~ ^/_matrix/client/(v1|unstable)/rooms/.*/relations/'
       - name: '~ ^/_matrix/client/v1/rooms/.*/threads$'
-      - name: '~ ^/_matrix/client/unstable/org.matrix.msc2716/rooms/.*/batch_send$'
       - name: '~ ^/_matrix/client/unstable/im.nheko.summary/rooms/.*/summary$'
       - name: '~ ^/_matrix/client/(r0|v3|unstable)/account/3pid$'
       - name: '~ ^/_matrix/client/(r0|v3|unstable)/account/whoami$'
