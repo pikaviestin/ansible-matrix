@@ -1,0 +1,20 @@
+---
+name: "Publish Collection"
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["master"]
+    paths: [".github/workflows/publish-collection.yaml"]
+
+jobs:
+  publish-collection:
+    name: Publish Collection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
+      - name: Ansible Publish
+        uses: ansible/ansible-publish-action@v1.0.0
+        with:
+          api_key: "${{ secrets.GALAXY_API_KEY }}"
