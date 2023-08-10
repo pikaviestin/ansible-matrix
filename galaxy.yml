@@ -1,11 +1,12 @@
 ---
 
-namespace: uumas
+namespace: pikaviestin
 name: matrix
 description: Matrix roles
 version: 0.0.4
 readme: README.md
-repository: https://git.uumas.fi/uumas/ansible-matrix
+repository: https://github.com/pikaviestin/ansible-matrix
 license_file: LICENSE
 authors:
   - uumas
+  - samip5
