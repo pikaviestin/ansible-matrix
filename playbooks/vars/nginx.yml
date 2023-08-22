@@ -238,6 +238,8 @@ nginx_servers:
         content:
           m.homeserver:
             base_url: "{{ matrix_external_url }}"
+          org.matrix.msc3575.proxy:
+            url: "{{ matrix_slidingsync_url | default(matrix_external_url) }}"
 
         headers:
           Access-Control-Allow-Origin: "'*'"
