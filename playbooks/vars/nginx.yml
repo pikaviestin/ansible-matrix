@@ -274,3 +274,22 @@ nginx_servers:
       - synapse_media_repository
       - synapse_generic_federation
       - synapse_generic_federation_send
+  - name: "{{ matrix_domain }}"
+    enabled: "{{ matrix_serve_wellknown_on_matrix_domain | default(false) }}"
+    return:
+      - location: '/'
+        type: 301
+        content: "{{ nginx_matrix_website_redirect }}"
+      - location: '/.well-known/matrix/server'
+        content_type: json
+        content:
+          m.server: "{{ matrix_server_domain }}"
+      - location: '/.well-known/matrix/client'
+        content_type: json
+        content:
+          m.homeserver:
+            base_url: "{{ matrix_external_url }}"
+          org.matrix.msc3575.proxy:
+            url: "{{ matrix_slidingsync_url | default(matrix_external_url) }}"
+        headers:
+          Access-Control-Allow-Origin: "'*'"
