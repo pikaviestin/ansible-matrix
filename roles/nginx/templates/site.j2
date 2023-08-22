@@ -55,6 +55,7 @@ map $http_upgrade $connection_upgrade {
 }
 
 {% for server in nginx_servers %}
+{% if server.enabled | default(true) %}
 server {
 {% for listener in server.listen | default([{}]) %}
 {% if listener.ip | default('all') == 'all' %}
@@ -153,4 +154,5 @@ server {
 {% endif %}
 }
 
+{% endif %}
 {% endfor %}
