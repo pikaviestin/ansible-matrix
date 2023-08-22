@@ -20,7 +20,10 @@
 - name: Set fact to regenerate certificates if new domains are added
   ansible.builtin.set_fact:
     certbot_regenerate: true
-  when: item.name is defined and 'DNS:' + item.name not in certinfo.subject_alt_name
+  when: 
+    - item.enabled | default(true)
+    - item.name is defined
+    - "'DNS:' + item.name not in certinfo.subject_alt_name"
   loop: "{{ nginx_servers }}"
 
 - name: Generate new certificate if one doesn't exist.
