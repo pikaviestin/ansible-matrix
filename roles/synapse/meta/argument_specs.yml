@@ -1,0 +1,59 @@
+---
+
+argument_specs:
+  main:
+    short_description: Synapse matrix server
+    description: Installs synapse matrix homeserver. Supports installation from debian repo or in docker
+    options:
+      synapse_install_method:
+        description: Installation method
+        type: str
+        required: false
+        default: debrepo
+        choices:
+          - debrepo
+
+      synapse_psql_host:
+        description: Postgresql host
+        type: str
+        required: false
+        default: localhost
+
+      synapse_psql_user:
+        description: Postgresql user. Defaults to value from psql_dbs['matrix-synapse']['user']
+        type: str
+        required: "{{ psql_dbs is not defined }}"
+      synapse_psql_pw:
+        description: Postgresql password. Defaults to value from psql_dbs['matrix-synapse']['password']
+        type: str
+        required: "{{ psql_dbs is not defined }}"
+      synapse_psql_db:
+        description: Postgresql database name.
+        type: str
+        required: false
+        default: "{{ synapse_psql_user }}"
+
+      matrix_max_upload_size_mb:
+        description: Maximum upload size in megabytes
+        type: int
+        required: false
+        default: 100
+
+      synapse_metrics:
+        description: Whether to enable metrics listener on port 9656 and workers on worker port + 1000
+        type: bool
+        required: false
+        default: false
+
+      synapse_presence:
+        description: Whether to enable presence on synapse server. This may cause high cpu usage
+        type: bool
+        required: false
+        default: true
+
+      matrix_auto_join_rooms:
+        description: A list of rooms all users will be joined to on first login
+        type: list
+        required: false
+        elements: str
+        default: []
