@@ -6,14 +6,6 @@
 - name: Include synapse configuration tasks
   ansible.builtin.import_tasks: config.yml
 
-- name: Ensure matrix-synapse-shared-secret-auth is the latest version
-  ansible.builtin.pip:
-    name: git+https://github.com/devture/matrix-synapse-shared-secret-auth
-    state: latest
-    virtualenv: /opt/venvs/matrix-synapse
-  notify: Config synapse service
-  when: synapse_shared_secret_auth is defined
-
 - name: Ensure synapse systemd units in place
   ansible.builtin.template:
     src: systemd/{{ item }}.j2

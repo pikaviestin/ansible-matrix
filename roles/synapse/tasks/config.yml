@@ -54,16 +54,6 @@
   when: synapse_ldap_servers is defined
   notify: Config matrix target
 
-- name: Ensure modules config is in place
-  ansible.builtin.template:
-    src: conf.d/modules.yaml.j2
-    dest: /etc/matrix-synapse/conf.d/modules.yaml
-    owner: matrix-synapse
-    group: nogroup
-    mode: '0600'
-  when: synapse_shared_secret_auth is defined
-  notify: Config matrix target
-
 - name: Ensure sso config is in place
   ansible.builtin.template:
     src: conf.d/sso.yaml.j2
