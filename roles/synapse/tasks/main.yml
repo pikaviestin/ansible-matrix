@@ -1,12 +1,7 @@
 ---
 
-- name: Fail if not debian
-  ansible.builtin.fail:
-  when: ansible_os_family != "Debian"
-
-- name: Include debian synapse installation tasks
-  ansible.builtin.include_tasks: install_debian.yml
-  when: ansible_os_family == "Debian"
+- name: Include synapse installation tasks
+  ansible.builtin.include_tasks: "install_{{ synapse_install_method }}.yml"
 
 - name: Include synapse configuration tasks
   ansible.builtin.import_tasks: config.yml
