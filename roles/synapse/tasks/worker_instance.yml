@@ -11,14 +11,14 @@
       ansible.builtin.template:
         src: worker.yaml.j2
         dest: /etc/matrix-synapse/workers/{{ worker }}.yaml
-        mode: 0644
+        mode: '0644'
       notify: Config worker services
 
     - name: Ensure logging config in place for {{ worker }}
       ansible.builtin.template:
         src: log.yaml.j2
         dest: /etc/matrix-synapse/worker-logs/{{ worker }}-log.yaml
-        mode: 0644
+        mode: '0644'
       notify: Config worker services
 
     - name: Add worker to synapse_worker_services variable

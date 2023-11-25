@@ -6,7 +6,7 @@
     dest: /etc/matrix-synapse/homeserver.signing.key
     owner: matrix-synapse
     group: nogroup
-    mode: 0600
+    mode: '0600'
   when: matrix_signing_key is defined
 
 - name: Ensure signing key permissions set correctly
@@ -15,7 +15,7 @@
     state: file
     owner: matrix-synapse
     group: nogroup
-    mode: 0600
+    mode: '0600'
   when: matrix_signing_key is not defined
 
 - name: Ensure synapse configs are in place
@@ -24,7 +24,7 @@
     dest: /etc/matrix-synapse/conf.d/{{ item }}.yaml
     owner: matrix-synapse
     group: nogroup
-    mode: 0644
+    mode: '0644'
   loop:
     - listeners
     - server_name
@@ -38,7 +38,7 @@
     dest: /etc/matrix-synapse/conf.d/{{ item }}.yaml
     owner: matrix-synapse
     group: nogroup
-    mode: 0600
+    mode: '0600'
   loop:
     - database
     - general
@@ -50,7 +50,7 @@
     dest: /etc/matrix-synapse/conf.d/password_providers.yaml
     owner: matrix-synapse
     group: nogroup
-    mode: 0644
+    mode: '0644'
   when: synapse_ldap_servers is defined
   notify: Config matrix target
 
@@ -60,7 +60,7 @@
     dest: /etc/matrix-synapse/conf.d/modules.yaml
     owner: matrix-synapse
     group: nogroup
-    mode: 0600
+    mode: '0600'
   when: synapse_shared_secret_auth is defined
   notify: Config matrix target
 
@@ -70,7 +70,7 @@
     dest: /etc/matrix-synapse/conf.d/sso.yaml
     owner: matrix-synapse
     group: nogroup
-    mode: 0644
+    mode: '0644'
   when: matrix_openidc_providers is defined
   notify: Config matrix target
 
@@ -80,6 +80,6 @@
     dest: /etc/matrix-synapse/conf.d/turn.yaml
     owner: matrix-synapse
     group: nogroup
-    mode: 0644
+    mode: '0644'
   when: turn_domain is defined
   notify: Config matrix target
