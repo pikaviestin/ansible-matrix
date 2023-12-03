@@ -3,10 +3,17 @@
 database:
   name: "psycopg2"
   args:
+{% if synapse_install_method == 'debrepo' %}
     user: "{{ synapse_psql_user }}"
     password: "{{ synapse_psql_pw }}"
-    database: {{ synapse_psql_db }}
-    host: {{ synapse_psql_host }}
+    database: "{{ synapse_psql_db }}"
+    host: "{{ synapse_psql_host }}"
+{% elif synapse_install_method == 'docker' %}
+    user: "{{ docker_service_name }}"
+    password: "{{ database_passwords[docker_service_name] }}"
+    database: "{{ docker_service_name }}"
+    host: "{{ docker_service_name }}_db"
+{% endif %}
     cp_min: 2
     cp_max: 3
 

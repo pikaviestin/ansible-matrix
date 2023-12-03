@@ -1,0 +1,5 @@
+---
+
+dependencies:
+  - role: uumas.docker.docker
+    when: synapse_install_method == 'docker'

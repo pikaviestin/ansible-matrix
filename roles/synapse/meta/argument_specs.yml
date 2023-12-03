@@ -12,26 +12,31 @@ argument_specs:
         default: debrepo
         choices:
           - debrepo
+          - docker
 
       synapse_psql_host:
-        description: Postgresql host
+        description: Postgresql host. Only used for debrepo installation.
         type: str
         required: false
         default: localhost
-
       synapse_psql_user:
-        description: Postgresql user. Defaults to value from psql_dbs['matrix-synapse']['user']
+        description: Postgresql user. Defaults to value from psql_dbs['matrix-synapse']['user']. Only used for debrepo installation.
         type: str
-        required: "{{ psql_dbs is not defined }}"
+        required: "{{ synapse_install_method == 'debrepo' and psql_dbs is not defined }}"
       synapse_psql_pw:
-        description: Postgresql password. Defaults to value from psql_dbs['matrix-synapse']['password']
+        description: Postgresql password. Defaults to value from psql_dbs['matrix-synapse']['password']. Only used for debrepo installation.
         type: str
-        required: "{{ psql_dbs is not defined }}"
+        required: "{{ synapse_install_method == 'debrepo' and psql_dbs is not defined }}"
       synapse_psql_db:
-        description: Postgresql database name.
+        description: Postgresql database name. Only used for debrepo installation.
         type: str
         required: false
         default: "{{ synapse_psql_user }}"
+
+      synapse_version:
+        description: Synapse version to use. For example 1.96.1. Only used for docker installation
+        type: str
+        required: "{{ synapse_install_method == 'docker' }}"
 
       matrix_max_upload_size_mb:
         description: Maximum upload size in megabytes

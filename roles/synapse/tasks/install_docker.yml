@@ -1,0 +1,29 @@
+---
+
+- name: Fail if workers wanted
+  ansible.builtin.fail:
+    msg: Workers not currently supported for docker installation. Use another synapse_install_method or implement it
+  when: synapse_workers is defined and synapse_workers | length > 0
+
+- name: Synapse container
+  import_role:
+    name: uumas.docker.container
+  vars:
+    docker_service: synapse
+    docker_image: "matrixdotorg/synapse:v{{ synapse_version }}"
+    docker_image_http_port: 8008
+    docker_database: postgres
+    docker_mounts:
+      - name: data
+        path: /data
+    docker_env:
+      SYNAPSE_CONFIG_PATH: /data/homeserver.yaml
+      SYNAPSE_CONFIG_DIR: /data/conf.d
+
+- name: Set synapse config mount
+  ansible.builtin.set_fact:
+    synapse_config_mount: "{{ container_out.container.Mounts | selectattr('Destination', 'equalto', '/data') | join }}"
+- name: Set synapse installation vars
+  ansible.builtin.set_fact:
+    synapse_config_path: "{{ synapse_config_mount.Source }}"
+    synapse_user: "{{ container_out.container.Config.User }}"

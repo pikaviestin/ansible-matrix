@@ -3,17 +3,17 @@
 - name: Ensure signing key matches matrix_signing_key variable
   ansible.builtin.copy:
     content: "{{ matrix_signing_key }}"
-    dest: /etc/matrix-synapse/homeserver.signing.key
-    owner: matrix-synapse
+    dest: "{{ synapse_config_path }}/homeserver.signing.key"
+    owner: "{{ synapse_user }}"
     group: nogroup
     mode: '0600'
   when: matrix_signing_key is defined
 
 - name: Ensure signing key permissions set correctly
   ansible.builtin.file:
-    path: /etc/matrix-synapse/homeserver.signing.key
+    path: "{{ synapse_config_path }}/homeserver.signing.key"
     state: file
-    owner: matrix-synapse
+    owner: "{{ synapse_user }}"
     group: nogroup
     mode: '0600'
   when: matrix_signing_key is not defined
@@ -21,8 +21,8 @@
 - name: Ensure synapse configs are in place
   ansible.builtin.template:
     src: conf.d/{{ item }}.yaml.j2
-    dest: /etc/matrix-synapse/conf.d/{{ item }}.yaml
-    owner: matrix-synapse
+    dest: "{{ synapse_config_path }}/conf.d/{{ item }}.yaml"
+    owner: "{{ synapse_user }}"
     group: nogroup
     mode: '0644'
   loop:
@@ -35,8 +35,8 @@
 - name: Ensure synapse configs including secrets is in place
   ansible.builtin.template:
     src: conf.d/{{ item }}.yaml.j2
-    dest: /etc/matrix-synapse/conf.d/{{ item }}.yaml
-    owner: matrix-synapse
+    dest: "{{ synapse_config_path }}/conf.d/{{ item }}.yaml"
+    owner: "{{ synapse_user }}"
     group: nogroup
     mode: '0600'
   loop:
@@ -47,8 +47,8 @@
 - name: Ensure password provider config is in place
   ansible.builtin.template:
     src: conf.d/password_providers.yaml.j2
-    dest: /etc/matrix-synapse/conf.d/password_providers.yaml
-    owner: matrix-synapse
+    dest: "{{ synapse_config_path }}/conf.d/password_providers.yaml"
+    owner: "{{ synapse_user }}"
     group: nogroup
     mode: '0644'
   when: synapse_ldap_servers is defined
@@ -57,8 +57,8 @@
 - name: Ensure sso config is in place
   ansible.builtin.template:
     src: conf.d/sso.yaml.j2
-    dest: /etc/matrix-synapse/conf.d/sso.yaml
-    owner: matrix-synapse
+    dest: "{{ synapse_config_path }}/conf.d/sso.yaml"
+    owner: "{{ synapse_user }}"
     group: nogroup
     mode: '0644'
   when: matrix_openidc_providers is defined
@@ -67,8 +67,8 @@
 - name: Ensure turn config is in place
   ansible.builtin.template:
     src: conf.d/turn.yaml.j2
-    dest: /etc/matrix-synapse/conf.d/turn.yaml
-    owner: matrix-synapse
+    dest: "{{ synapse_config_path }}/conf.d/turn.yaml"
+    owner: "{{ synapse_user }}"
     group: nogroup
     mode: '0644'
   when: turn_domain is defined

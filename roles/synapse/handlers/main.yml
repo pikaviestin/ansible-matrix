@@ -14,6 +14,20 @@
     enabled: true
     state: restarted
 
+- name: Restart synapse
+  block:
+    - name: Restart synapse (systemd)
+      ansible.builtin.systemd:
+        name: matrix-synapse.service
+        state: restarted
+      when: synapse_install_method == 'debrepo'
+
+    - name: Restart synapse (docker)
+      community.docker.docker_container:
+        name: "{{ docker_service_name }}"
+        restart: true
+      when: synapse_install_method == 'docker'
+
 - name: Disable worker services
   ansible.builtin.systemd:
     name: "matrix-synapse-worker@{{ item }}.service"

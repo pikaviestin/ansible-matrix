@@ -6,18 +6,6 @@
 - name: Include synapse configuration tasks
   ansible.builtin.import_tasks: config.yml
 
-- name: Ensure synapse systemd units in place
-  ansible.builtin.template:
-    src: systemd/{{ item }}.j2
-    dest: /etc/systemd/system/{{ item }}
-    mode: '0644'
-  loop:
-    - matrix-synapse.service
-    - matrix.target
-  notify:
-    - Config synapse service
-    - Config matrix target
-
 - name: Include synapse worker tasks
   ansible.builtin.include_tasks: workers.yml
   when: synapse_workers is defined

@@ -37,3 +37,20 @@
     name: redis-server
     state: present
   when: synapse_workers is defined
+
+- name: Ensure synapse systemd units in place
+  ansible.builtin.template:
+    src: systemd/{{ item }}.j2
+    dest: /etc/systemd/system/{{ item }}
+    mode: '0644'
+  loop:
+    - matrix-synapse.service
+    - matrix.target
+  notify:
+    - Config synapse service
+    - Config matrix target
+
+- name: Set synapse installation variables
+  ansible.builtin.set_fact:
+    synapse_config_path: /etc/matrix-synapse
+    synapse_user: matrix-synapse
