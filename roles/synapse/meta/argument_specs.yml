@@ -1,0 +1,53 @@
+---
+
+argument_specs:
+  main:
+    short_description: Matrix Synaspe
+    description: "Installs and configures a synapse server. Supports workers and matrix_synapse_shared_secret_auth"
+    options:
+      synapse_psql_user:
+        description: Postgres database username for synapse
+        type: str
+        required: true
+      synapse_psql_pw:
+        description: Postgres database password for synapse
+        type: str
+        required: true
+      synapse_psql_db:
+        description: Postgres database name for synapse
+        type: str
+        required: false
+        default: "{{ synapse_psql_user }}"
+      synapse_psql_host:
+        description: Postgres database server hostname
+        type: str
+        required: false
+        default: localhost
+
+      matrix_max_upload_size_mb:
+        description: Maximum file upload size for synapse in megabytes
+        type: int
+        required: false
+        default: 100
+      matrix_auto_join_rooms:
+        description: A list of room aliases new users will be joined to automatically
+        type: list
+        required: false
+        default: []
+
+      matrix_signing_key:
+        description: Matrix federation signing key. Will use auto-generated one if not defined.
+        type: str
+        required: false
+
+      synapse_metrics:
+        description: Whether to enable prometheus metrics listener on port 9656
+        type: bool
+        required: false
+        default: false
+      
+      synapse_presence:
+        description: Whether to enable presence detection on synapse. If disabled all users will be shown as permanently offline.
+        type: bool
+        required: false
+        default: true
