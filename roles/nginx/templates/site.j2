@@ -99,6 +99,7 @@ server {
 {% if location.name | length != 0 %}
 	location {{ location.name }} {
 		proxy_pass http://{{ upstream }};
+		proxy_http_version 1.1;
 {% if location.proxy_headers is mapping %}
 {% for header in location.proxy_headers | dict2items %}
 		proxy_set_header {{ header.key }} {{ header.value }};
@@ -136,6 +137,7 @@ server {
 {% if location.name | length != 0 %}
 	location {{ location.name }} {
 		proxy_pass http://${{ map }};
+		proxy_http_version 1.1;
 {% if nginx_proxy_headers is mapping %}
 {% for header in nginx_proxy_headers | dict2items %}
 		proxy_set_header {{ header.key }} {{ header.value }};
