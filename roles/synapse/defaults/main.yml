@@ -1,5 +1,7 @@
 ---
 
+synapse_install_method: debrepo
+
 synapse_psql_host: localhost
 synapse_psql_user: "{{ psql_dbs['matrix-synapse']['user'] }}"
 synapse_psql_pw: "{{ psql_dbs['matrix-synapse']['password'] }}"

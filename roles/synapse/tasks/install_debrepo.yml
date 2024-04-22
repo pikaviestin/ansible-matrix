@@ -1,5 +1,10 @@
 ---
 
+- name: Fail if not debian
+  ansible.builtin.fail:
+    msg: debrepo installation method only works on debian. Use another synapse_install_method or use debian
+  when: ansible_os_family != "Debian"
+
 - name: Ensure synapse dependencies are installed
   ansible.builtin.apt:
     name:

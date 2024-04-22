@@ -2,17 +2,28 @@
 
 argument_specs:
   main:
-    short_description: Matrix Synaspe
-    description: "Installs and configures a synapse server. Supports workers and matrix_synapse_shared_secret_auth"
+    short_description: Synapse matrix server
+    description: >
+      Installs and configures a synapse matrix homeserver.
+      Supports workers and matrix_synapse_shared_secret_auth.
+      Supports installation from debian repo or in docker.
     options:
+      synapse_install_method:
+        description: Installation method
+        type: str
+        required: false
+        default: debrepo
+        choices:
+          - debrepo
+
       synapse_psql_user:
-        description: Postgres database username for synapse
+        description: Postgres database username for synapse. Defaults to value from psql_dbs['matrix-synapse']['user']
         type: str
-        required: true
+        required: "{{ psql_dbs is not defined }}"
       synapse_psql_pw:
-        description: Postgres database password for synapse
+        description: Postgres database password for synapse. Defaults to value from psql_dbs['matrix-synapse']['password']
         type: str
-        required: true
+        required: "{{ psql_dbs is not defined }}"
       synapse_psql_db:
         description: Postgres database name for synapse
         type: str
@@ -30,8 +41,9 @@ argument_specs:
         required: false
         default: 100
       matrix_auto_join_rooms:
-        description: A list of room aliases new users will be joined to automatically
+        description: A list of room aliases new users will be joined to on first login
         type: list
+        elements: str
         required: false
         default: []
 
@@ -41,11 +53,11 @@ argument_specs:
         required: false
 
       synapse_metrics:
-        description: Whether to enable prometheus metrics listener on port 9656
+        description: Whether to enable prometheus metrics listener on port 9656 and workers on worker port + 1000
         type: bool
         required: false
         default: false
-      
+
       synapse_presence:
         description: Whether to enable presence detection on synapse. If disabled all users will be shown as permanently offline.
         type: bool

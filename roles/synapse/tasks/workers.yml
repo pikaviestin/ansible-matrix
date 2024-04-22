@@ -4,20 +4,20 @@
   ansible.builtin.template:
     src: conf.d/workers.yaml.j2
     dest: /etc/matrix-synapse/conf.d/workers.yaml
-    mode: 0644
+    mode: '0644'
 
 - name: Ensure worker systemd unit in place
   ansible.builtin.template:
     src: systemd/matrix-synapse-worker@.service.j2
     dest: /etc/systemd/system/matrix-synapse-worker@.service
-    mode: 0644
+    mode: '0644'
   notify: Config worker services
 
 - name: Ensure worker config directories exist
   ansible.builtin.file:
     path: /etc/matrix-synapse/{{ item }}
     state: directory
-    mode: 0755
+    mode: '0755'
   loop:
     - workers
     - worker-logs
