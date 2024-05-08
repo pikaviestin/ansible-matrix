@@ -4,8 +4,7 @@ argument_specs:
   main:
     short_description: Synapse matrix server
     description: >
-      Installs and configures a synapse matrix homeserver.
-      Supports workers and matrix_synapse_shared_secret_auth.
+      Installs and configures a synapse matrix homeserver. Supports workers.
       Supports installation from debian repo or in docker.
     options:
       synapse_install_method:
@@ -34,6 +33,14 @@ argument_specs:
         type: str
         required: false
         default: localhost
+
+      synapse_doublepuppet_token:
+        description: >
+          If defined, sets up a appservice for doublepuppeting, with this token
+          allowed to act on behalf of any local user.
+        type: str
+        required: false
+        defulat: ''
 
       matrix_max_upload_size_mb:
         description: Maximum file upload size for synapse in megabytes

@@ -73,3 +73,32 @@
     mode: '0644'
   when: turn_domain is defined
   notify: Config matrix target
+
+- name: Configure doublepuppet appservice
+  when: synapse_doublepuppet_token | length > 0
+  block:
+    - name: Ensure doublepuppet registration is in place
+      ansible.builtin.template:
+        src: doublepuppet-registration.yaml.j2
+        dest: /etc/matrix-synapse/doublepuppet-registration.yaml
+        owner: matrix-synapse
+        group: nogroup
+        mode: '0600'
+      notify: Config matrix target
+
+    - name: Ensure appservice config file present
+      ansible.builtin.lineinfile:
+        path: /etc/matrix-synapse/conf.d/appservice.yaml
+        line: 'app_service_config_files:'
+        regexp: '^app_service_config_files: *?$'
+        create: true
+        mode: 0644
+        insertbefore: BOF
+      notify: Config matrix target
+
+    - name: Configure doublepuppet appservice
+      ansible.builtin.lineinfile:
+        path: '/etc/matrix-synapse/conf.d/appservice.yaml'
+        line: "  - '/etc/matrix-synapse/doublepuppet-registration.yaml'"
+        regexp: '^.*doublepuppet.*$'
+      notify: Config matrix target

@@ -11,4 +11,6 @@ matrix_max_upload_size_mb: 100
 synapse_metrics: false
 synapse_presence: true
 
+synapse_doublepuppet_token: ''
+
 matrix_auto_join_rooms: []
