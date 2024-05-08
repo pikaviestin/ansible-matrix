@@ -1,0 +1,6 @@
+---
+
+depends:
+  - ffmpeg
+
+mautrix_port: 29334

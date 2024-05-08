@@ -1,0 +1,18 @@
+{% extends 'mautrix-go.yaml.j2' %}
+
+{% block homeserver %}
+    public_address: {{ matrix_external_url }}
+{% endblock %}
+
+{% block bridge %}
+    backfill:
+        forward_limits:
+            initial:
+                dm: 100
+                channel: 100
+                thread: 100
+            missed:
+                dm: 1000
+                channel: 1000
+                thread: 1000
+{% endblock %}
