@@ -1,0 +1,79 @@
+# {{ ansible_managed }}
+
+homeserver:
+    address: http://localhost:8009
+    domain: {{ matrix_domain }}
+    async_media: true
+{% block homeserver %}{% endblock %}
+
+appservice:
+    address: http://localhost:{{ mautrix_port }}
+    hostname: localhost
+    port: {{ mautrix_port }}
+    id: {{ bridge_service }}
+
+    database:
+        type: postgres
+        uri: postgres://{{ psql_dbs[matrix_extra]['user'] }}:{{ psql_dbs[matrix_extra]['password']|urlencode() }}@localhost/{{ matrix_extra }}?sslmode=disable
+
+    bot:
+        username: {{ bridge_service }}bot
+        displayname: {{ bridge_service_capitalized }} {{ matrix_bridge_name_suffix }}
+{% if mautrix_avatar | length > 0 %}
+        avatar: {{ mautrix_avatar }}
+{% endif %}
+
+# FIXME Prometheus telemetry config. Requires prometheus-client to be installed.
+metrics:
+    enabled: false
+    listen_port: 8000
+
+bridge:
+    username_template: {{ bridge_service }}_{{ '{{.}}' }}
+    personal_filtering_spaces: true
+    delivery_receipts: true
+    sync_direct_chat_list: true
+    
+    double_puppet_server_map:
+        {{ matrix_domain }}: {{ matrix_external_url }}
+    double_puppet_allow_discovery: true
+# FIXME Support other_homeservers
+    login_shared_secret_map:
+        {{ matrix_domain }}: "as_token:{{ synapse_doublepuppet_token }}"
+{% if matrix_extra_other_homeserver_doublepuppet_tokens is defined %}
+{% for item in matrix_extra_other_homeserver_doublepuppet_tokens | dict2items %}
+        {{ item.key }}: "{{ item.value }}"
+{% endfor %}
+{% endif %}
+
+    management_room_text:
+        welcome: "Hello, I'm a {{ bridge_service_capitalized }} bridge bot."
+
+    encryption:
+        allow: true
+        default: {{ mautrix_default_encrypt }}
+        require: false
+
+    permissions:
+        "*": relay
+        "{{ matrix_domain }}": user
+{% if matrix_bridge_other_homeservers is defined %}
+{% for item in matrix_bridge_other_homeservers %}
+        "{{ item }}": user
+{% endfor %}
+{% endif %}
+{% if matrix_bridge_admins is defined %}
+{% for item in matrix_bridge_admins %}
+        "{{ item }}": admin
+{% endfor %}
+{% endif %}
+
+    relay:
+        enabled: true
+
+{% block bridge %}{% endblock %}
+
+{% block additional %}{% endblock %}
+
+logging:
+    min_level: info

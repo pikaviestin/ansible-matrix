@@ -3,9 +3,22 @@
 matrix_extra_wait_before_start: false
 matrix_extra_workdir: /opt/{{ matrix_extra }}
 
-mautrix_permissions:
-  relay: relay
-  user: user
-  admin: admin
-mautrix_blocks: []
+matrix_extra_tasks:
+  - github-release
+  - appservice
+
+matrix_extra_software: "{{ matrix_extra }}"
+bridge_service: "{{ matrix_extra | replace('mautrix-','') }}"
+bridge_service_capitalized: "{{ bridge_service | capitalize }}"
+
+mautrix_avatar: ''
 mautrix_default_encrypt: false
+
+registrationgen_exec: >
+  {{ matrix_extra_workdir }}/{{ matrix_extra }}
+  -g
+  -r '{{ matrix_extra_workdir }}/appservice-registration.yaml'
+  -c '{{ matrix_extra_workdir }}/config.yaml'
+exec: >
+  {{ matrix_extra_workdir }}/{{ matrix_extra }}
+  -c {{ matrix_extra_workdir }}/config.yaml

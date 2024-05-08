@@ -3,14 +3,6 @@
 depends:
   - ffmpeg
 
-matrix_extra_tasks:
-  - mautrix-whatsapp
+bridge_service_capitalized: WhatsApp
 
-registrationgen_exec: >
-  {{ matrix_extra_workdir }}/mautrix-whatsapp
-  -g
-  -r '{{ matrix_extra_workdir }}/appservice-registration.yaml'
-  -c '{{ matrix_extra_workdir }}/config.yaml'
-exec: >
-  {{ matrix_extra_workdir }}/mautrix-whatsapp
-  -c {{ matrix_extra_workdir }}/config.yaml
+mautrix_port: 29318

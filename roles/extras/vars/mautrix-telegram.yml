@@ -19,17 +19,3 @@ exec: >
   -c {{ matrix_extra_workdir }}/config.yaml
 
 mautrix_port: 29317
-mautrix_loggers:
-  - mau
-  - telethon
-  - aiohttp
-mautrix_blocks:
-  - public
-  - provisioning
-  - delivery_error_reports
-  - displayname_template
-  - backfill
-mautrix_permissions:
-  relay: relaybot
-  user: full
-  admin: admin

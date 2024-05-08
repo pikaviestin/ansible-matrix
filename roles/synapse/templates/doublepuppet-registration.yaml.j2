@@ -1,0 +1,13 @@
+---
+
+id: doublepuppet
+url:
+as_token: "{{ synapse_doublepuppet_token }}"
+hs_token: "{{ synapse_doublepuppet_token }}" # Never used anywhere
+sender_localpart: doublepuppetsenderlocalpart # Never used anywhere
+rate_limited: false
+
+namespaces:
+  users:
+    - regex: '@.*:{{ matrix_domain | replace('.', '\.') }}'
+      exclusive: false

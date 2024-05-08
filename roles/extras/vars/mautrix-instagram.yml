@@ -1,30 +1,5 @@
 ---
 
-depends: "{{ python_depends }}"
-
-matrix_extra_tasks:
-  - pip
-  - appservice
-
-pip_packages:
-  - 'git+https://github.com/mautrix/instagram.git#egg=mautrix-instagram[all]'
-
-registrationgen_exec: >
-  {{ matrix_extra_workdir }}/bin/python -m mautrix_instagram
-  -g
-  -r '{{ matrix_extra_workdir }}/appservice-registration.yaml'
-  -c '{{ matrix_extra_workdir }}/config.yaml'
-exec: >
-  {{ matrix_extra_workdir }}/bin/python -m mautrix_instagram
-  -c {{ matrix_extra_workdir }}/config.yaml
-
+matrix_extra_software: "mautrix-meta"
 mautrix_port: 29330
-mautrix_loggers:
-  - mau
-  - mauigpapi
-  - aiohttp
-  - paho.mqtt
-mautrix_blocks:
-  - relay
-  - delivery_error_reports
-  - backfill
+mautrix_avatar: "mxc://maunium.net/JxjlbZUlCPULEeHZSwleUXQv"

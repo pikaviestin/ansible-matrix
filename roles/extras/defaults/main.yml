@@ -2,9 +2,6 @@
 
 matrix_bridge_name_suffix: 'bridge'
 mautrix_whatsapp_web_name: 'Mautrix-WhatsApp bridge'
-mautrix_whatsapp_web_shortname: 'mx-wa'
-
-matrix_bridge_ephemeral_events: true
 
 python_depends:
   - build-essential
@@ -16,10 +13,3 @@ python_depends:
   - python3-setuptools
   - python3-dev
   - libpq-dev
-
-matrix_extra_repos:
-  signald:
-    repo: 'deb https://updates.signald.org unstable main'
-    key:
-      id: 'D89FFB45291229A410A1430A659475081F665F29'
-      url: 'https://updates.signald.org/apt-signing-key.asc'

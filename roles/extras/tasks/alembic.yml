@@ -1,7 +1,0 @@
----
-
-- name: Alembic update database
-  ansible.builtin.command: /opt/{{ matrix_extra }}/bin/alembic -c /opt/{{ matrix_extra }}/alembic.ini -x config=/opt/{{ matrix_extra }}/config.yaml upgrade head
-  args:
-    chdir: /opt/{{ matrix_extra }}
-  when: install.changed

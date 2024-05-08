@@ -1,31 +1,107 @@
-{% extends 'mautrix-bridge.yaml.j2' %}
+# {{ ansible_managed }}
 
-{% block backfill %}
-{{ super() }}
-        normal_groups: true
-{% endblock %}
+homeserver:
+    address: http://localhost:8009
+    domain: {{ matrix_domain }}
+    async_media: true
 
-{% block bridge %}
+appservice:
+    address: http://localhost:{{ mautrix_port }}
+    hostname: localhost
+    port: {{ mautrix_port }}
+    id: {{ bridge_service }}
+
+    database: postgres://{{ psql_dbs[matrix_extra]['user'] }}:{{ psql_dbs[matrix_extra]['password']|urlencode() }}@localhost/{{ matrix_extra }}
+
+    public:
+        enabled: true
+        prefix: /{{ bridge_service }}
+        external: {{ matrix_external_url }}/{{ bridge_service }}
+
+    bot_username: {{ bridge_service }}bot
+    bot_displayname: {{ bridge_service_capitalized }} {{ matrix_bridge_name_suffix }}
+
+# FIXME Prometheus telemetry config. Requires prometheus-client to be installed.
+metrics:
+    enabled: false
+    listen_port: 8000
+
+bridge:
+    displayname_template: "{displayname}"
+    sync_create_limit: 50
+    sync_deferred_create_all: true
+    sync_direct_chat_list: true
+
+    double_puppet_server_map:
+        {{ matrix_domain }}: {{ matrix_external_url }}
+    double_puppet_allow_discovery: true
+# FIXME Support other_homeservers
+    login_shared_secret_map:
+        {{ matrix_domain }}: "as_token:{{ synapse_doublepuppet_token }}"
+{% if matrix_extra_other_homeserver_doublepuppet_tokens is defined %}
+{% for item in matrix_extra_other_homeserver_doublepuppet_tokens | dict2items %}
+        {{ item.key }}: "{{ item.value }}"
+{% endfor %}
+{% endif %}
+
     invite_link_resolve: true
-    max_document_size: {{ matrix_max_upload_size_mb }}
+
+    encryption:
+        allow: true
+        default: {{ mautrix_default_encrypt }}
+        require: false
+
+    delivery_receipts: true
 
     bridge_notices:
         default: true
- 
+
     relay_user_distinguishers: []
- 
-    state_event_formats:
-        join: ''
-        leave: ''
 
-    sync_channel_members: true
-    public_portals: true
+    permissions:
+        "*": "relaybot"
+        "{{ matrix_domain }}": "full"
+{% if matrix_bridge_other_homeservers is defined %}
+{% for item in matrix_bridge_other_homeservers %}
+        "{{ item }}": "full"
+{% endfor %}
+{% endif %}
+{% if matrix_bridge_admins is defined %}
+{% for item in matrix_bridge_admins %}
+        "{{ item }}": "admin"
+{% endfor %}
+{% endif %}
 
-{% endblock %}
-
-{% block additional %}
 telegram:
     api_id: {{ matrix_telegram_api_id }}
     api_hash: {{ matrix_telegram_api_hash }}
     bot_token: {{ matrix_telegram_bot_token }}
-{% endblock %}
+
+logging:
+    version: 1
+    formatters:
+        colored:
+            (): mautrix_telegram.util.ColorFormatter
+            format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
+        normal:
+            format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
+    handlers:
+        file:
+            class: logging.handlers.RotatingFileHandler
+            formatter: normal
+            filename: ./mautrix-telegram.log
+            maxBytes: 10485760
+            backupCount: 10
+        console:
+            class: logging.StreamHandler
+            formatter: colored
+    loggers:
+        mau:
+            level: DEBUG
+        telethon:
+            level: INFO
+        aiohttp:
+            level: INFO
+    root:
+        level: INFO
+        handlers: [file, console]
