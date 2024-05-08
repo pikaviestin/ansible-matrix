@@ -1,0 +1,7 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>samip5/renovate-config",
+    "github>samip5/renovate-config:automerge-github-actions"
+  ]
+}
