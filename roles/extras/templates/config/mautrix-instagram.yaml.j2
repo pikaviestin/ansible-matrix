@@ -1,13 +1,1 @@
-{% extends 'mautrix-bridge.yaml.j2' %}
-
-{% block bridge %}
-    periodic_reconnect:
-        interval: 86400
-    private_chat_name_template: '{displayname} (Instagram)'
-    unimportant_bridge_notices: false
-{% endblock %}
-
-{% block additional %}
-instagram:
-    device_seed: {{ matrix_instagram_device_seed }}
-{% endblock %}
+{% extends 'mautrix-meta.yaml.j2' %}

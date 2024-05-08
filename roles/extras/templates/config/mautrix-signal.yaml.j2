@@ -1,17 +1,1 @@
-{% extends 'mautrix-bridge.yaml.j2' %}
-
-{% block backfill %}
-{{ super() }}
-{% endblock %}
-
-{% block bridge %}
-    public_portals: true
-    relaybot: '@realaybot:{{ matrix_domain }}'
-{% endblock %}
-
-{% block additional %}
-signal:
-    avatar_dir: /var/lib/signald/data
-    data_dir: /var/lib/signald/data
-    delete_unknown_accounts_on_start: true
-{% endblock %}
+{% extends 'mautrix-go.yaml.j2' %}

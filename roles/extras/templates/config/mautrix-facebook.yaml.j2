@@ -1,9 +1,1 @@
-{% extends 'mautrix-bridge.yaml.j2' %}
-
-{% block bridge %}
-    periodic_reconnect:
-        interval: 86400
-    temporary_disconnect_notices: false
-    refresh_on_reconnection_fail: true
-{% endblock %}
-
+{% extends 'mautrix-meta.yaml.j2' %}

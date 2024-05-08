@@ -8,6 +8,11 @@
   when: config.changed or install.changed
   become_user: "{{ matrix_extra }}"
 
+- name: Ensure registration file has correct permissions
+  ansible.builtin.file:
+    path: "/opt/{{ matrix_extra }}/appservice-registration.yaml"
+    mode: 0644
+
 - name: Add appservice to synapse config - {{ matrix_extra }}
   become_user: root
   block:
