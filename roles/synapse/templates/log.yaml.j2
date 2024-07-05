@@ -54,8 +54,8 @@ loggers:
         propagate: false
 
 root:
-{% if worker_default_log_level is defined %}
-    level: {{ worker_default_log_level }}
+{% if logging_config.synapse_worker.min_level is defined %}
+    level: {{ logging_config.synapse_worker.min_level }}
 {% else %}
     level: WARNING
 {% endif %}

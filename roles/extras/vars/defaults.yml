@@ -14,6 +14,16 @@ bridge_service_capitalized: "{{ bridge_service | capitalize }}"
 mautrix_avatar: ''
 mautrix_default_encrypt: false
 
+logging_config:
+  bridge:
+    min_level: INFO
+    writers:
+      - type: file
+        filename: logs/bridge.log
+        max_age: 86400
+        compress: false
+      - type: journald
+
 registrationgen_exec: >
   {{ matrix_extra_workdir }}/{{ matrix_extra }}
   -g
