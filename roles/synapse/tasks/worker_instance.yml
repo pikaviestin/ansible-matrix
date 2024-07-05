@@ -14,10 +14,6 @@
         mode: '0644'
       notify: Config worker services
 
-    - name: Debug worker logging_level
-      debug:
-        var: logging_config.synapse_worker.min_level
-
     - name: Ensure logging config in place for {{ worker }}
       ansible.builtin.template:
         src: log.yaml.j2
