@@ -54,11 +54,7 @@ loggers:
         propagate: false
 
 root:
-{% if logging_config.synapse_worker.min_level is defined %}
-    level: {{ logging_config.synapse_worker.min_level }}
-{% else %}
-    level: WARNING
-{% endif %}
+    level: {{ logging_config.synapse_worker.min_level | default("WARNING") }}
     # Write logs to the `buffer` handler, which will buffer them together in memory,
     # then write them to a file.
     #

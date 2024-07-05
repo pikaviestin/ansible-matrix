@@ -16,7 +16,7 @@ mautrix_default_encrypt: false
 
 logging_config:
   bridge:
-    min_level: INFO
+    min_level: info
     writers:
       - type: file
         filename: logs/bridge.log
