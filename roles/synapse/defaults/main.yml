@@ -10,6 +10,7 @@ synapse_psql_db: "{{ synapse_psql_user }}"
 matrix_max_upload_size_mb: 100
 synapse_metrics: false
 synapse_presence: true
+worker_default_log_level: WARNING
 
 synapse_doublepuppet_token: ''
 
