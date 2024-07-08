@@ -16,7 +16,7 @@ worker_listeners:
 
 {% if synapse_metrics %}
   - type: metrics
-    port: {{ worker_port + 1000 }}
+    port: {{ worker_port + synapse_worker_metrics_base_port }}
     bind_addresses: ['0.0.0.0'] # Don't bind to multiple addresses
 {% endif %}
 {% endif %}

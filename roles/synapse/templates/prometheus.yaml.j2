@@ -1,0 +1,20 @@
+# {{ ansible_managed }}
+scrape_configs:
+  - job_name: "synapse"
+    scrape_interval: 15s
+    metrics_path: "/metrics"
+    static_configs:
+    - targets: ["{{ inventory_hostname }}:9656"]
+      labels:
+        instance: "{{ inventory_hostname.split('.')[0] }}"
+        job: "master"
+        index: "0"
+{% for worker_type, ports in synapse_workers.items() %}
+{%- for port in ports %}
+    - targets: ["{{ inventory_hostname }}:{{ port + synapse_worker_metrics_base_port }}"]
+      labels:
+        instance: "{{ inventory_hostname.split('.')[0] }}"
+        job: "{{ worker_type }}"
+        index: "{{ loop.index }}"
+{% endfor %}
+{% endfor %}

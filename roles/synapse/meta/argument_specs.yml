@@ -70,3 +70,9 @@ argument_specs:
         type: bool
         required: false
         default: true
+
+      synapse_worker_metrics_base_port:
+        description: This defines what the metrics port becomes for each worker
+        type: int
+        required: false
+        default: 1000
