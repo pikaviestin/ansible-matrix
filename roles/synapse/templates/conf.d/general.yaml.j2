@@ -10,5 +10,6 @@ enable_group_creation: true
 enable_metrics: {{ synapse_metrics }}
 use_presence: {{ synapse_presence }}
 enable_media_repo: {{ matrix_media_repo_server is not defined and 'media_repository' not in synapse_workers }}
+log_config: /etc/matrix-synapse/{{ matrix_domain }}.log.yaml
 retention:
   enabled: true

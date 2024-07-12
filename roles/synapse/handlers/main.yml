@@ -14,6 +14,11 @@
     enabled: true
     state: restarted
 
+- name: Restart synapse
+  ansible.builtin.systemd:
+    name: matrix-synapse.service
+    state: restarted
+
 - name: Disable worker services
   ansible.builtin.systemd:
     name: "matrix-synapse-worker@{{ item }}.service"

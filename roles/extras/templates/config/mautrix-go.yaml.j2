@@ -76,21 +76,6 @@ bridge:
 {% block additional %}{% endblock %}
 
 logging:
-{% if logging_config.bridge.min_level is defined %}
-    min_level: {{ logging_config.bridge.min_level }}
-{% else %}
-    min_level: info
-{% endif %}
-{% if logging_config.bridge.writers is defined %}
+    min_level: {{ matrix_extras_bridge_loglevel }}
     writers:
-{% for writer in logging_config.bridge.writers %}
-      - type: {{ writer.type }}
-{% if writer.type == 'file' %}
-        filename: {{ writer.filename }}
-        max_age: {{ writer.max_age }}
-        compress: {{ writer.compress }}
-{% endif %}
-{% endfor %}
-{% endif %}
-
-
+      - type: journald
