@@ -18,6 +18,15 @@
     mode: '0600'
   when: matrix_signing_key is not defined
 
+- name: Ensure synapse logging config in place
+  ansible.builtin.template:
+    src: log.yaml.j2
+    dest: /etc/matrix-synapse/{{ matrix_domain }}.log.yaml
+    owner: matrix-synapse
+    group: nogroup
+    mode: '0644'
+  notify: Restart synapse
+
 - name: Ensure synapse configs are in place
   ansible.builtin.template:
     src: conf.d/{{ item }}.yaml.j2

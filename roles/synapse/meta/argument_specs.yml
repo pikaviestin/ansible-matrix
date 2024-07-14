@@ -71,6 +71,17 @@ argument_specs:
         required: false
         default: true
 
+      matrix_synapse_loglevel:
+        description: Synapse log level, applies to main homeserver and workers
+        type: str
+        choices:
+          - DEBUG
+          - INFO
+          - WARNING
+          - ERROR
+        required: false
+        default: WARNING
+
       synapse_worker_metrics_base_port:
         description: This defines what the metrics port becomes for each worker
         type: int

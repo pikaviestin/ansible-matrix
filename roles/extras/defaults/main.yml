@@ -1,6 +1,8 @@
 ---
 
 matrix_bridge_name_suffix: 'bridge'
+matrix_extras_bridge_loglevel: info
+
 mautrix_whatsapp_web_name: 'Mautrix-WhatsApp bridge'
 
 python_depends:
