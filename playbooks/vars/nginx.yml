@@ -21,6 +21,12 @@ nginx_upstreams:
           Host: "{{ matrix_domain }}"
         additional_options:
           - "client_max_body_size {{ matrix_max_upload_size_mb }}M"
+      - name: '/_matrix/client/v1/media'
+        proxy_headers:
+          Host: "{{ matrix_domain }}"
+      - name: '/_matrix/federation/v1/media'
+        proxy_headers:
+          Host: "{{ matrix_domain }}"
 
   synapse_generic_sync:
     servers: "{{ synapse_workers.generic_sync | default('') }}"

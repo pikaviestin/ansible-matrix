@@ -55,9 +55,9 @@ argument_specs:
         default: []
 
       matrix_signing_key:
-        description: Matrix federation signing key. Will use auto-generated one if not defined.
+        description: Matrix federation signing key
         type: str
-        required: false
+        required: true
 
       synapse_metrics:
         description: Whether to enable prometheus metrics listener on port 9656 and workers on worker port + 1000
@@ -87,3 +87,11 @@ argument_specs:
         type: int
         required: false
         default: 1000
+
+      synapse_matrix_media_repo_signing_key:
+        description: >
+          Signing key matrix media repo uses to sign media.
+          Synapse will not use this but just publishes the public key so others can verify media.
+          Required if using matrix media repo
+        type: str
+        required: false
