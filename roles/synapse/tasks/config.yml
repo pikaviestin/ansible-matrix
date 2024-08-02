@@ -92,7 +92,7 @@
         line: 'app_service_config_files:'
         regexp: '^app_service_config_files: *?$'
         create: true
-        mode: 0644
+        mode: '0644'
         insertbefore: BOF
       notify: Config matrix target
 

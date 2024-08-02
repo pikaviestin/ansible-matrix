@@ -8,7 +8,7 @@ matrix_extra_tasks:
   - appservice
 
 matrix_extra_software: "{{ matrix_extra }}"
-bridge_service: "{{ matrix_extra | replace('mautrix-','') }}"
+bridge_service: "{{ matrix_extra | replace('mautrix-', '') }}"
 bridge_service_capitalized: "{{ bridge_service | capitalize }}"
 
 mautrix_avatar: ''

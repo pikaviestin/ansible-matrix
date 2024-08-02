@@ -18,11 +18,11 @@ argument_specs:
       synapse_psql_user:
         description: Postgres database username for synapse. Defaults to value from psql_dbs['matrix-synapse']['user']
         type: str
-        required: "{{ psql_dbs is not defined }}"
+        required: false
       synapse_psql_pw:
         description: Postgres database password for synapse. Defaults to value from psql_dbs['matrix-synapse']['password']
         type: str
-        required: "{{ psql_dbs is not defined }}"
+        required: false
       synapse_psql_db:
         description: Postgres database name for synapse
         type: str
@@ -40,7 +40,7 @@ argument_specs:
           allowed to act on behalf of any local user.
         type: str
         required: false
-        defulat: ''
+        default: ''
 
       matrix_max_upload_size_mb:
         description: Maximum file upload size for synapse in megabytes

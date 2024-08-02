@@ -46,9 +46,8 @@
   ansible.builtin.include_tasks: matrix-synchrotrons.yml
 
 - name: Create a prometheus scrape file for workers
-  when: synapse_metrics
   ansible.builtin.template:
     src: prometheus.yaml.j2
     dest: /etc/matrix-synapse/prom_config.yaml
-
-
+    mode: '0644'
+  when: synapse_metrics

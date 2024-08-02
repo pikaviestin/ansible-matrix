@@ -8,12 +8,7 @@
 - name: Install dependencies for {{ matrix_extra }}
   ansible.builtin.apt:
     name: "{{ depends }}"
-    state: latest
-
-- name: Install dependencies from custom repos for {{ matrix_extra }}
-  ansible.builtin.include_tasks: repo.yml
-  when: repo_depends is defined
-  loop: "{{ repo_depends }}"
+    state: present
 
 - name: Create user for {{ matrix_extra }}
   ansible.builtin.user:
@@ -23,13 +18,14 @@
     shell: /bin/false
 
 - name: Configure {{ matrix_extra }}
+  become: true
   become_user: "{{ matrix_extra }}"
   block:
     - name: Put config in place for {{ matrix_extra }}
       ansible.builtin.template:
         src: "config/{{ matrix_extra }}.yaml.j2"
         dest: "/opt/{{ matrix_extra }}/config.yaml.ansibled"
-        mode: 0644
+        mode: "0644"
         backup: true
       notify: Restart matrix target
       register: config
@@ -37,7 +33,7 @@
       ansible.builtin.copy:
         src: "/opt/{{ matrix_extra }}/config.yaml.ansibled"
         dest: "/opt/{{ matrix_extra }}/config.yaml"
-        mode: 0644
+        mode: "0644"
         remote_src: true
       when: config.changed
 
@@ -51,7 +47,7 @@
   ansible.builtin.template:
     src: 'matrix-extra.service'
     dest: "/etc/systemd/system/{{ matrix_extra }}.service"
-    mode: 0644
+    mode: "0644"
   register: systemd_unit
 
 - name: Enable systemd unit {{ matrix_extra }}

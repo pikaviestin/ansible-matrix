@@ -1,7 +1,7 @@
 ---
 
-- name: Install latest {{ matrix_extra }} release from github releases
+- name: "Install latest release from github releases: {{ matrix_extra }}"
   ansible.builtin.get_url:
     url: "https://github.com/mautrix/{{ matrix_extra_software | replace('mautrix-', '') }}/releases/latest/download/{{ matrix_extra_software }}-amd64"
     dest: "/opt/{{ matrix_extra }}/{{ matrix_extra }}"
-    mode: '755'
+    mode: "0755"

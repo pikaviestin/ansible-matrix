@@ -4,16 +4,17 @@
   ansible.builtin.command: "{{ registrationgen_exec }}"
   args:
     chdir: "{{ matrix_extra_workdir }}"
+  changed_when: true
   notify: Restart matrix target
   when: config.changed or install.changed
-  become_user: "{{ matrix_extra }}"
 
 - name: Ensure registration file has correct permissions
   ansible.builtin.file:
     path: "/opt/{{ matrix_extra }}/appservice-registration.yaml"
-    mode: 0644
+    mode: "0644"
 
 - name: Add appservice to synapse config - {{ matrix_extra }}
+  become: true
   become_user: root
   block:
     - name: Ensure appservice config file present
@@ -22,7 +23,7 @@
         line: 'app_service_config_files:'
         regexp: '^app_service_config_files: *?$'
         create: true
-        mode: 0644
+        mode: "0644"
         insertbefore: BOF
       notify: Restart synapse
 
