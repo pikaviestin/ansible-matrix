@@ -7,6 +7,7 @@ certbot_regenerate: false
 
 nginx_proxy_headers:
   X-Forwarded-For: '$remote_addr'
+  X-Real-IP: '$remote_addr'
   X-Forwarded-Proto: '$scheme'
   Host: '$host'
   Upgrade: '$http_upgrade'
