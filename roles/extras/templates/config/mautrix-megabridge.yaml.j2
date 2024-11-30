@@ -1,0 +1,91 @@
+---
+# {{ ansible_managed }}
+
+network:
+{% block network %}{% endblock %}
+
+bridge:
+    personal_filtering_spaces: true
+    cleanup_on_logout:
+        enabled: true
+        manual:
+            private: nothing
+            relayed: nothing
+            shared_no_users: kick
+            shared_has_users: kick
+        bad_credentials:
+            private: nothing
+            relayed: nothing
+            shared_no_users: kick
+            shared_has_users: kick
+    relay:
+        enabled: true
+        admin_only: true
+        default_relays:
+            - "{{ matrix_bridge_relaybot_user }}"
+    permissions:
+        "*": relay
+        "{{ matrix_domain }}": user
+{% if matrix_bridge_other_homeservers is defined %}
+{% for domain in matrix_bridge_other_homeservers %}
+        "{{ domain }}": user
+{% endfor %}
+{% endif %}
+{% if matrix_bridge_admins is defined %}
+{% for user in matrix_bridge_admins %}
+        "{{ user }}": admin
+{% endfor %}
+{% endif %}
+
+database:
+    type: postgres
+    uri: postgres://{{ psql_dbs[matrix_extra]['user'] }}:{{ psql_dbs[matrix_extra]['password']|urlencode() }}@localhost/{{ matrix_extra }}?sslmode=disable
+    
+homeserver:
+    address: http://localhost:8009
+    domain: {{ matrix_domain }}
+    async_media: true
+
+appservice:
+    address: http://localhost:{{ mautrix_port }}
+    hostname: localhost
+    port: {{ mautrix_port }}
+    id: {{ bridge_service }}
+    bot:
+        username: {{ bridge_service }}bot
+        displayname: {{ bridge_service_capitalized }} {{ matrix_bridge_name_suffix }}
+{% if mautrix_avatar | length > 0 %}
+        avatar: {{ mautrix_avatar }}
+{% endif %}
+    username_template: {{ bridge_service }}_{{ '{{.}}' }}
+
+matrix:
+    delivery_receipts: true
+    sync_direct_chat_list: true
+
+backfill:
+    enabled: true
+ 
+double_puppet:
+    servers:
+        {{ matrix_domain }}: {{ matrix_external_url }}
+    allow_discovery: true
+    secrets:
+        {{ matrix_domain }}: "as_token:{{ synapse_doublepuppet_token }}"
+{% if matrix_extra_other_homeserver_doublepuppet_tokens is defined %}
+{% for item in matrix_extra_other_homeserver_doublepuppet_tokens | dict2items %}
+        {{ item.key }}: "{{ item.value }}"
+{% endfor %}
+{% endif %}
+
+encryption:
+    allow: true
+    default: {{ mautrix_default_encrypt }}
+    require: false
+    allow_key_sharing: true
+    pickle_key: maunium.net/go/{{ matrix_extra }}
+
+logging:
+    min_level: {{ matrix_extras_bridge_loglevel }}
+    writers:
+      - type: journald

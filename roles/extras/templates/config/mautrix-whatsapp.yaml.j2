@@ -1,14 +1,8 @@
-{% extends 'mautrix-go.yaml.j2' %}
-{% block bridge %}
-    allow_user_invite: true
+{% extends 'mautrix-megabridge.yaml.j2' %}
+{% block network %}
+    os_name: "{{ mautrix_whatsapp_web_name }}"
     url_previews: true
     extev_polls: true
-
     history_sync:
-        backfill: true
         request_full_sync: true
-{% endblock %}
-{% block additional %}
-whatsapp:
-    os_name: {{ mautrix_whatsapp_web_name }}
 {% endblock %}

@@ -1,6 +1,4 @@
-{% extends 'mautrix-go.yaml.j2' %}
-
-{% block additional %}
-meta:
+{% extends 'mautrix-megabridge.yaml.j2' %}
+{% block network %}
     mode: {{ bridge_service }}
 {% endblock %}
