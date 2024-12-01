@@ -83,7 +83,7 @@ encryption:
     default: {{ mautrix_default_encrypt }}
     require: false
     allow_key_sharing: true
-    pickle_key: maunium.net/go/{{ matrix_extra }}
+    pickle_key: {{ maunium_pickle_key }}
 
 logging:
     min_level: {{ matrix_extras_bridge_loglevel }}

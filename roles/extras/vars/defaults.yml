@@ -14,6 +14,8 @@ bridge_service_capitalized: "{{ bridge_service | capitalize }}"
 mautrix_avatar: ''
 mautrix_default_encrypt: false
 
+maunium_pickle_key: maunium.net/go/{{ matrix_extra }}
+
 registrationgen_exec: >
   {{ matrix_extra_workdir }}/{{ matrix_extra }}
   -g

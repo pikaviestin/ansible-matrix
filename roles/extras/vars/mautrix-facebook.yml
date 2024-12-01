@@ -3,3 +3,4 @@
 matrix_extra_software: "mautrix-meta"
 mautrix_port: 29319
 mautrix_avatar: "mxc://maunium.net/ygtkteZsXnGJLJHRchUwYWak"
+maunium_pickle_key: mautrix.bridge.e2ee
