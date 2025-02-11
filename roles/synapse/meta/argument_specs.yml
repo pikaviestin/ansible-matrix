@@ -15,7 +15,7 @@ argument_specs:
         choices:
           - debrepo
 
-      monitor_hostname:
+      synapse_monitor_hostname:
         description: The hostname to use for monitoring. If not set, defaults to inventory_hostname.
         type: str
         required: false

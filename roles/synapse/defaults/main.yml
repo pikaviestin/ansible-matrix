@@ -17,4 +17,4 @@ synapse_doublepuppet_token: ''
 
 matrix_auto_join_rooms: []
 
-monitor_hostname: "{{ inventory_hostname }}"
+synapse_monitor_hostname: "{{ inventory_hostname }}"
