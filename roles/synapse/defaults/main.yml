@@ -16,3 +16,5 @@ synapse_worker_metrics_base_port: 1000
 synapse_doublepuppet_token: ''
 
 matrix_auto_join_rooms: []
+
+monitor_hostname: "{{ inventory_hostname }}"

@@ -45,11 +45,6 @@
 - name: Ensure synchrotron balancer removed (legacy)
   ansible.builtin.include_tasks: matrix-synchrotrons.yml
 
-- name: Set default monitor hostname if not provided
-  set_fact:
-    monitor_hostname: "{{ monitor_hostname | default(inventory_hostname) }}"
-  when: not monitor_hostname
-
 - name: Create a prometheus scrape file for workers
   ansible.builtin.template:
     src: prometheus.yaml.j2
