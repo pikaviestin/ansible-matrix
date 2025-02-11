@@ -15,6 +15,11 @@ argument_specs:
         choices:
           - debrepo
 
+      synapse_monitor_hostname:
+        description: The hostname to use for monitoring. If not set, defaults to inventory_hostname.
+        type: str
+        required: false
+
       synapse_psql_user:
         description: Postgres database username for synapse. Defaults to value from psql_dbs['matrix-synapse']['user']
         type: str
