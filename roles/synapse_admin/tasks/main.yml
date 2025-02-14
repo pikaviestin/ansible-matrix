@@ -1,0 +1,4 @@
+---
+
+- name: Include synapse_admin installation tasks
+  ansible.builtin.include_tasks: "install_{{ synapse_admin_install_method }}.yml"
