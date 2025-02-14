@@ -1,0 +1,1 @@
+Installs synapse_admin

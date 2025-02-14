@@ -1,0 +1,52 @@
+---
+
+- name: Fail if not debian
+  ansible.builtin.fail:
+    msg: nodejs installation method only works on debian. Use another synapse_admin_install_method or use debian
+  when: ansible_os_family != "Debian"
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - git
+      - nodejs
+      - yarn
+    state: present
+
+- name: Create group for application
+  ansible.builtin.group:
+   name: "{{ synapse_admin_group }}"
+   state: present
+
+- name: Create user for application
+  ansible.builtin.user:
+    name: "{{ synapse_admin_user }}"
+    group: "{{ synapse_admin_group }}"
+    home: "{{ synapse_admin_base_path }}"
+    createhome: yes
+    shell: "/bin/nologin"
+    state: present
+
+- name: Clone application repository ({{ synapse_admin_version }}) to {{ synapse_admin_base_path }}
+  ansible.builtin.git:
+   dest: "{{ synapse_admin_base_path }}"
+   repo: https://github.com/etkecc/synapse-admin.git
+   version: "{{ synapse_admin_version }}"
+   owner: "{{ synapse_admin_user }}"
+   group: "{{ synapse_admin_group }}"
+
+- name: Create systemd service
+  ansible.builtin.template:
+    src: "templates/synapse-admin.service.j2"
+    dest: "/etc/systemd/system/synapse-admin.service"
+    mode: "0644"
+  notify: Reload systemd daemon
+
+- name: Enable and start Synapse Admin service
+  ansible.builtin.systemd:
+    name: synapse-admin
+    state: started
+    enabled: yes
+
+
+

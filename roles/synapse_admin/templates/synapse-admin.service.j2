@@ -1,0 +1,13 @@
+[Unit]
+Description=Synapse Admin
+After=network.target
+
+[Service]
+Type=simple
+User={{ synapse_admin_user }}
+WorkingDirectory={{ synapse_admin_base_path }}
+ExecStart=/usr/bin/yarn start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
