@@ -27,13 +27,11 @@
     shell: "/bin/nologin"
     state: present
 
-- name: Clone application repository ({{ synapse_admin_version }}) to {{ synapse_admin_base_path }}
+- name: Clone application repository
   ansible.builtin.git:
    dest: "{{ synapse_admin_base_path }}"
    repo: https://github.com/etkecc/synapse-admin.git
    version: "{{ synapse_admin_version }}"
-   owner: "{{ synapse_admin_user }}"
-   group: "{{ synapse_admin_group }}"
 
 - name: Create systemd service
   ansible.builtin.template:
