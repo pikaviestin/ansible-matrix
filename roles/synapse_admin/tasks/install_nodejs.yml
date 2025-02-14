@@ -23,7 +23,7 @@
     name: "{{ synapse_admin_user }}"
     group: "{{ synapse_admin_group }}"
     home: "{{ synapse_admin_base_path }}"
-    createhome: yes
+    createhome: true
     shell: "/bin/nologin"
     state: present
 
@@ -46,7 +46,7 @@
   ansible.builtin.systemd:
     name: synapse-admin
     state: started
-    enabled: yes
+    enabled: true
 
 
 
