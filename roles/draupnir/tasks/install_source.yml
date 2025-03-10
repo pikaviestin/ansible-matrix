@@ -10,8 +10,8 @@
 - name: Create user
   ansible.builtin.user:
     name: draupnir
-    shell: /bin/nologin
-    home: "{{ matrix_bot_draupnir_data_path }}"
+    shell: /usr/sbin/nologin
+    home: "{{ draupnir_data_path }}"
     system: true
     create_home: true
 
@@ -23,18 +23,18 @@
     repo: "https://github.com/the-draupnir-project/Draupnir.git"
     # renovate: datasource=github-releases depName=the-draupnir-project/draupnir
     version: "v2.2.0"
-    dest: "{{ matrix_bot_draupnir_data_path }}/src"
+    dest: "{{ draupnir_data_path }}/src"
 
 - name: Check current permissions
   ansible.builtin.stat:
-    path: "{{ matrix_bot_draupnir_data_path }}"
+    path: "{{ draupnir_data_path }}"
   register: draupnir_stat
 
 - name: Make sure permissions are right
   become: true
   become_user: root
   ansible.builtin.command:
-    cmd: "chown -R draupnir:draupnir {{ matrix_bot_draupnir_data_path }}"
+    cmd: "chown -R draupnir:draupnir {{ draupnir_data_path }}"
   when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"
 
 - name: corepack enable
@@ -48,11 +48,11 @@
   become_user: draupnir
   ansible.builtin.command:
     cmd: "yarn install"
-    chdir: "{{ matrix_bot_draupnir_data_path }}/src"
+    chdir: "{{ draupnir_data_path }}/src"
 
 - name: Yarn build
   become: true
   become_user: draupnir
   ansible.builtin.command:
     cmd: "yarn build"
-    chdir: "{{ matrix_bot_draupnir_data_path }}/src"
+    chdir: "{{ draupnir_data_path }}/src"

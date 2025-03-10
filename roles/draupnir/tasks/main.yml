@@ -5,7 +5,7 @@
   when: ansible_os_family == 'Debian'
 
 - name: Include bot installation tasks
-  ansible.builtin.include_tasks: "install_{{ matrix_bot_draupnir_install_method }}.yml"
+  ansible.builtin.include_tasks: "install_{{ draupnir_install_method }}.yml"
 
 - name: Include bot configuration tasks
   ansible.builtin.import_tasks: config.yml
