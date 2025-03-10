@@ -1,0 +1,12 @@
+---
+
+- name: Config bot draupnir service
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: matrix-bot-draupnir.service
+    enabled: true
+
+- name: Restart bot draupnir
+  ansible.builtin.systemd:
+    name: matrix-bot-draupnir.service
+    state: restarted

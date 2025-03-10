@@ -1,0 +1,82 @@
+---
+
+argument_specs:
+  main:
+    short_description: Moderator bot for Matrix (Draupnir)
+    description: >
+        Installs and configures a Draupnir bot for Matrix. Supports installation from source.
+    options:
+      matrix_bot_draupnir_install_method:
+        description: Installation method
+        type: str
+        required: false
+        default: source
+        choices:
+          - source
+
+      matrix_bot_draupnir_psql_user:
+        description: Postgres database username for synapse. Defaults to value from psql_dbs['matrix-bot-draupnir']['user']
+        type: str
+        required: false
+      matrix_bot_draupnir_psql_pw:
+        description: Postgres database password for synapse. Defaults to value from psql_dbs['matrix-bot-draupnir']['password']
+        type: str
+        required: false
+      matrix_bot_draupnir_psql_db:
+        description: Postgres database name for synapse
+        type: str
+        required: false
+        default: "{{ matrix_bot_draupnir_psql_user }}"
+      matrix_bot_draupnir_psql_host:
+        description: Postgres database server hostname
+        type: str
+        required: false
+        default: localhost
+
+
+      matrix_bot_draupnir_loging_level:
+        description: Bot log level
+        type: str
+        choices:
+          - DEBUG
+          - INFO
+        required: false
+        default: INFO
+
+      matrix_bot_draupnir_abuse_reporting_enabled:
+        description: Enable abuse reporting
+        type: bool
+        required: false
+        default: false
+
+      matrix_bot_draupnir_web_enabled:
+        description: Enable web interface
+        type: bool
+        required: false
+        default: "{{ matrix_bot_draupnir_abuse_reporting_enabled }}"
+
+      matrix_bot_draupnir_display_reports:
+        description: Display abuse reports
+        type: bool
+        required: false
+        default: "{{ matrix_bot_draupnir_abuse_reporting_enabled }}"
+
+      matrix_bot_draupnir_web_bind_address:
+        description: Web interface bind address
+        type: str
+        required: false
+        default: "127.0.0.1"
+
+      matrix_bot_draupnir_web_port:
+        description: Web interface port
+        type: int
+        required: false
+        default: 8080
+
+      matrix_bot_draupnir_dataPath:
+        description: Path to store bot data
+        type: str
+        required: false
+        default: /opt/draupnir/data
+
+

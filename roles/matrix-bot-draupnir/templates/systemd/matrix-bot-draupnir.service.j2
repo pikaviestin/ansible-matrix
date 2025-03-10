@@ -1,0 +1,16 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Matrix moderation bot
+PartOf=matrix.target
+
+[Service]
+Type=oneshot
+User=draupnir
+WorkingDirectory=/opt/draupnir
+ExecStart=/usr/bin/node /opt/draupnir/src/lib/index.js --draupnir-config /opt/draupnir/data/config.yaml
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=matrix.target

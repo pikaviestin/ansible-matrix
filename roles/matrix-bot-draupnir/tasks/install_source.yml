@@ -1,0 +1,41 @@
+---
+
+- name: Ensure draupnir dependencies are installed
+  ansible.builtin.apt:
+    name:
+      - yarn
+      - nodejs
+    state: present
+
+- name: Create user
+  ansible.builtin.user:
+    name: draupnir
+    shell: /bin/nologin
+    home: /opt/draupnir
+    system: yes
+    create_home: yes
+
+
+- name: Clone the source code
+  ansible.builtin.git:
+    repo: "https://github.com/the-draupnir-project/Draupnir.git"
+    # renovate: datasource=github-releases depName=the-draupnir-project/draupnir
+    version: "v2.2.0"
+    dest: "/opt/draupnir/src"
+
+- name: Make sure permissions are right
+  become: true
+  ansible.builtin.command:
+    cmd: "chown -R draupnir:draupnir /opt/draupnir"
+
+- name: Yarn install
+  become_user: draupnir
+  ansible.builtin.command:
+    cmd: "yarn install"
+    chdir: "/opt/draupnir/src"
+
+- name: Yarn build
+  become_user: draupnir
+  ansible.builtin.command:
+    cmd: "yarn build"
+    chdir: "/opt/draupnir/src"

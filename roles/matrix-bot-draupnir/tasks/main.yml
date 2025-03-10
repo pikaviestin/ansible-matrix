@@ -1,0 +1,17 @@
+---
+
+- name: Include bot installation tasks
+  ansible.builtin.include_tasks: "install_{{ matrix_bot_draupnir_install_method }}.yml"
+
+- name: Include bot configuration tasks
+  ansible.builtin.import_tasks: config.yml
+
+- name: Ensure bot systemd units in place
+  ansible.builtin.template:
+    src: systemd/{{ item }}.j2
+    dest: /etc/systemd/system/{{ item }}
+    mode: '0644'
+  loop:
+    - matrix-bot-draupnir.service
+  notify:
+    - Config bot draupnir service
