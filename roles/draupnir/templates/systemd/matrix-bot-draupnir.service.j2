@@ -9,8 +9,8 @@ User=draupnir
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
 SyslogIdentifier=draupnir
-WorkingDirectory={{ matrix_bot_draupnir_data_path }}
-ExecStart=/usr/bin/node {{ matrix_bot_draupnir_data_path }}/src/lib/index.js --draupnir-config {{ matrix_bot_draupnir_data_path }}/data/config.yaml
+WorkingDirectory={{ draupnir_data_path }}
+ExecStart=/usr/bin/node {{ draupnir_data_path }}/src/lib/index.js --draupnir-config {{ draupnir_data_path }}/data/config.yaml
 Restart=always
 RestartSec=3
 

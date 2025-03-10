@@ -11,13 +11,16 @@ nginx_upstreams:
       - name: "{{ '/_matrix/media/' if matrix_media_repo_server is not defined and 'media_repository' not in synapse_workers | default('') else '' }}"
         additional_options:
           - "client_max_body_size {{ matrix_max_upload_size_mb }}M"
-  synapse_local:
+  synapse_admin:
     # Idea behind this is that the draupnir bot needs access to the admin API
     servers:
       - 8008
     locations:
       - name: '/_matrix'
       - name: '/_synapse'
+      - name: "{{ '/_matrix/media/' if matrix_media_repo_server is not defined and 'media_repository' not in synapse_workers | default('') else '' }}"
+        additional_options:
+          - "client_max_body_size {{ matrix_max_upload_size_mb }}M"
 
   matrix_media_repo:
     servers:
@@ -232,24 +235,28 @@ nginx_maps:
       "'~Bearer syt_(?<username>.*?)_.*'": $username
       "''": $mxid_localpart_urlparam
 
+
 nginx_servers:
-  - listen:
-      - ip: "{{ synapse_monitor_hostname }}"
-        port: 9656
+  - name: "{{ synapse_monitor_hostname }}"
+    listen:
+      - ip: "all"
+        port: 8056
     reverse_proxy:
-        - synapse_local
-        - synapse_generic_sync
-        - synapse_generic_init_sync
-        - synapse_generic_client
-        - synapse_generic_login
-        - synapse_generic_event_send
-        - synapse_generic_pagination
-        - synapse_user_dir
-        - synapse_device_persister
-        - synapse_typing_persister
-        - synapse_account_persister
-        - synapse_receipt_persister
-        - synapse_presence_persister
+      - synapse_admin
+      - matrix_media_repo
+      - synapse_media_repository
+      - synapse_generic_sync
+      - synapse_generic_init_sync
+      - synapse_generic_client
+      - synapse_generic_login
+      - synapse_generic_event_send
+      - synapse_generic_pagination
+      - synapse_user_dir
+      - synapse_device_persister
+      - synapse_typing_persister
+      - synapse_account_persister
+      - synapse_receipt_persister
+      - synapse_presence_persister
     reverse_proxy_map:
       - sync
   - listen:
