@@ -78,5 +78,3 @@ argument_specs:
         type: str
         required: false
         default: /opt/draupnir/data
-
-

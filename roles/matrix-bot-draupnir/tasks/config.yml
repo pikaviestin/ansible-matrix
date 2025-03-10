@@ -4,4 +4,5 @@
   ansible.builtin.template:
     src: "config.yaml.j2"
     dest: "/opt/draupnir/data/config.yaml"
+
   tags: config

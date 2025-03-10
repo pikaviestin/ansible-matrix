@@ -12,8 +12,8 @@
     name: draupnir
     shell: /bin/nologin
     home: /opt/draupnir
-    system: yes
-    create_home: yes
+    system: true
+    create_home: true
 
 
 - name: Clone the source code
@@ -23,18 +23,28 @@
     version: "v2.2.0"
     dest: "/opt/draupnir/src"
 
+- name: Check current permissions
+  ansible.builtin.stat:
+    path: /opt/draupnir
+  register: draupnir_stat
+
 - name: Make sure permissions are right
   become: true
+  become_user: root
   ansible.builtin.command:
     cmd: "chown -R draupnir:draupnir /opt/draupnir"
+  when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"
 
 - name: Yarn install
+  become: true
   become_user: draupnir
   ansible.builtin.command:
     cmd: "yarn install"
     chdir: "/opt/draupnir/src"
+  creates: "/opt/draupnir/src/node_modules"
 
 - name: Yarn build
+  become: true
   become_user: draupnir
   ansible.builtin.command:
     cmd: "yarn build"
