@@ -43,6 +43,42 @@ argument_specs:
         required: false
         default: INFO
 
+      matrix_bot_draupnir_homeserver_url:
+        description: Matrix homeserver URL
+        type: str
+        required: false
+        default: "{{ matrix_external_url }}"
+
+      matrix_bot_draupnir_raw_homeserver_url:
+        description: Matrix homeserver URL with _admin exposed
+        type: str
+        required: false
+        default: "http://localhost:8008"
+
+      matrix_bot_draupnir_access_token:
+        description: Bot access token
+        type: str
+        required: true
+
+      matrix_bot_draupnir_management_room:
+        description: Management room ID in !room@domain format or alias
+        type: str
+        required: true
+
+      matrix_bot_draupnir_disable_server_acl:
+        description: | 
+         Disables server ACL
+         DO NOT change this to `true` unless you are very confident that you know what you are doing.
+        type: bool
+        required: false
+        default: false
+
+      matrix_bot_draupnir_enable_room_state_backing_store:
+        description: Enable room state backing store
+        type: bool
+        required: false
+        default: false
+
       matrix_bot_draupnir_abuse_reporting_enabled:
         description: Enable abuse reporting
         type: bool
@@ -73,7 +109,7 @@ argument_specs:
         required: false
         default: 8080
 
-      matrix_bot_draupnir_dataPath:
+      matrix_bot_draupnir_data_path:
         description: Path to store bot data
         type: str
         required: false

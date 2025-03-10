@@ -19,7 +19,7 @@ accessToken: {{ matrix_bot_draupnir_access_token | to_json }}
 experimentalRustCrypto: {{ matrix_bot_draupnir_enable_experimental_rust_crypto | to_json }}
 
 # The path Draupnir will store its state/data in, leave default ("/data/storage") when using containers.
-dataPath: {{ matrix_bot_draupnir_dataPath }}
+dataPath: {{ matrix_bot_draupnir_data_path }}
 
 # If true (the default), Draupnir will only accept invites from users present in managementRoom.
 autojoinOnlyIfManager: true
