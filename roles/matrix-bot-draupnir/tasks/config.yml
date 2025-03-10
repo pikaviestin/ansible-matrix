@@ -1,7 +1,18 @@
 ---
 
+- name: Check if data dir exists
+  ansible.builtin.stat:
+    path: "{{ matrix_bot_draupnir_data_path }}/data"
+  register: dir_stat
+
+- name: Create directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ matrix_bot_draupnir_data_path }}/data"
+    state: directory
+  when: not dir_stat.stat.exists
+
 - name: Copy configuration file
   ansible.builtin.template:
     src: "config.yaml.j2"
-    dest: "/opt/draupnir/data/config.yaml"
+    dest: "{{ matrix_bot_draupnir_data_path }}/data/config.yaml"
   tags: config

@@ -1,21 +1,23 @@
 ---
 
-- name: add deb.nodesource.com apt key
-  apt_key:
-    id: 9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280
-    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-    keyring: /etc/apt/trusted.gpg.d/nodesource.gpg
+- name: Add deb.nodesource.com repository
+  deb822_repository:
+    name: nodesource
+    types: deb
+    uris: https://deb.nodesource.com/node_20.x
+    suites: nodistro
+    components: main
+    signed_by: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
   register: repositories
 
-- name: add apt.nodesource.com repository
+- name: add nodejs preference
   copy:
     content: |
-      # Managed by ansible, changes will be overwritten
-      deb https://deb.nodesource.com/node_20.x nodistro main
-      deb-src https://deb.nodesource.com/node_20.x nodistro main
-    dest: /etc/apt/sources.list.d/nodesource.list
+      Package: nodejs
+      Pin: origin deb.nodesource.com
+      Pin-Priority: 600
+    dest: /etc/apt/preferences.d/nodejs
   when: ansible_distribution != 'Ubuntu'
-  register: repositories
 
 - name: force update apt repositories
   apt:

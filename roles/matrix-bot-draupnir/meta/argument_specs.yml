@@ -34,7 +34,7 @@ argument_specs:
         default: localhost
 
 
-      matrix_bot_draupnir_loging_level:
+      matrix_bot_draupnir_log_level:
         description: Bot log level
         type: str
         choices:
