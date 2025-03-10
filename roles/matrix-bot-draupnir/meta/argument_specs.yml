@@ -79,6 +79,12 @@ argument_specs:
         required: false
         default: false
 
+      matrix_bot_draupnir_enable_experimental_rust_crypto:
+        description: Enable experimental Rust crypto
+        type: bool
+        required: false
+        default: false
+
       matrix_bot_draupnir_abuse_reporting_enabled:
         description: Enable abuse reporting
         type: bool
