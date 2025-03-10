@@ -17,6 +17,8 @@
 
 
 - name: Clone the source code
+  become: true
+  become_user: draupnir
   ansible.builtin.git:
     repo: "https://github.com/the-draupnir-project/Draupnir.git"
     # renovate: datasource=github-releases depName=the-draupnir-project/draupnir
@@ -41,7 +43,6 @@
   ansible.builtin.command:
     cmd: "yarn install"
     chdir: "/opt/draupnir/src"
-  creates: "/opt/draupnir/src/node_modules"
 
 - name: Yarn build
   become: true

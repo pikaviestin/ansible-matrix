@@ -1,0 +1,30 @@
+---
+
+- name: add deb.nodesource.com apt key
+  apt_key:
+    id: 9FD3B784BC1C6FC31A8A0A1C1655A0AB68576280
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    keyring: /etc/apt/trusted.gpg.d/nodesource.gpg
+  register: repositories
+
+- name: add apt.nodesource.com repository
+  copy:
+    content: |
+      # Managed by ansible, changes will be overwritten
+      deb https://deb.nodesource.com/node_20.x nodistro main
+      deb-src https://deb.nodesource.com/node_20.x nodistro main
+    dest: /etc/apt/sources.list.d/nodesource.list
+  when: ansible_distribution != 'Ubuntu'
+  register: repositories
+
+- name: force update apt repositories
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+  when: repositories.changed
+
+- name: update apt repositories
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+    force_apt_get: yes

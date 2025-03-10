@@ -14,7 +14,7 @@ nginx_upstreams:
   synapse_local:
     # Idea behind this is that the draupnir bot needs access to the admin API
     servers:
-      - 8100
+      - 8008
     locations:
       - name: '/_matrix'
       - name: '/_synapse'
