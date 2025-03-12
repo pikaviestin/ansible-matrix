@@ -5,6 +5,7 @@
     name:
       - yarn
       - nodejs
+    update_cache: true
     state: present
 
 - name: Create user

@@ -230,7 +230,7 @@ health:
   # and 1.0 means "trace performance at every opportunity".
   # tracesSampleRate: 0.5
 
-  {% if draupnir_web_enabled %}
+{% if draupnir_web_enabled %}
 # Options for exposing web APIs.
 web:
   # Whether to enable web APIs.
@@ -257,7 +257,7 @@ web:
   abuseReporting:
     # Whether to enable this feature.
     enabled: {{ draupnir_abuse_reporting_enabled | to_json }}
-  {% endif %}
+{% endif %}
 
 # Whether to actively poll synapse for abuse reports, to be used
 # instead of intercepting client calls to synapse's abuse endpoint, when that
