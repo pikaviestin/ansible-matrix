@@ -39,12 +39,12 @@
     cmd: "chown -R draupnir:draupnir {{ draupnir_data_path }}"
   when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"
 
-- name: corepack enable
+- name: Enable corepack
   become: true
   become_user: root
   ansible.builtin.command:
     cmd: "corepack enable"
-  when: draupnir_git.changed
+  changed_when: draupnir_git.changed
 
 - name: Yarn install
   become: true
@@ -52,7 +52,7 @@
   ansible.builtin.command:
     cmd: "yarn install"
     chdir: "{{ draupnir_data_path }}/src"
-  when: draupnir_git.changed
+  changed_when: draupnir_git.changed
 
 - name: Yarn build
   become: true
@@ -60,4 +60,4 @@
   ansible.builtin.command:
     cmd: "yarn build"
     chdir: "{{ draupnir_data_path }}/src"
-  when: draupnir_git.changed
+  changed_when: draupnir_git.changed
