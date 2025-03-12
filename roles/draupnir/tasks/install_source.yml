@@ -25,6 +25,7 @@
     # renovate: datasource=github-releases depName=the-draupnir-project/draupnir
     version: "v2.2.0"
     dest: "{{ draupnir_data_path }}/src"
+  register: draupnir_git
 
 - name: Check current permissions
   ansible.builtin.stat:
@@ -43,6 +44,7 @@
   become_user: root
   ansible.builtin.command:
     cmd: "corepack enable"
+  when: draupnir_git.changed
 
 - name: Yarn install
   become: true
@@ -50,6 +52,7 @@
   ansible.builtin.command:
     cmd: "yarn install"
     chdir: "{{ draupnir_data_path }}/src"
+  when: draupnir_git.changed
 
 - name: Yarn build
   become: true
@@ -57,3 +60,4 @@
   ansible.builtin.command:
     cmd: "yarn build"
     chdir: "{{ draupnir_data_path }}/src"
+  when: draupnir_git.changed
