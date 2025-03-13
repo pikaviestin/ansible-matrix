@@ -1,0 +1,63 @@
+---
+
+- name: Ensure draupnir dependencies are installed
+  ansible.builtin.apt:
+    name:
+      - yarn
+      - nodejs
+    update_cache: true
+    state: present
+
+- name: Create user
+  ansible.builtin.user:
+    name: draupnir
+    shell: /usr/sbin/nologin
+    home: "{{ draupnir_data_path }}"
+    system: true
+    create_home: true
+
+
+- name: Clone the source code
+  become: true
+  become_user: draupnir
+  ansible.builtin.git:
+    repo: "https://github.com/the-draupnir-project/Draupnir.git"
+    # renovate: datasource=github-releases depName=the-draupnir-project/draupnir
+    version: "v2.2.0"
+    dest: "{{ draupnir_data_path }}/src"
+  register: draupnir_git
+
+- name: Check current permissions
+  ansible.builtin.stat:
+    path: "{{ draupnir_data_path }}"
+  register: draupnir_stat
+
+- name: Make sure permissions are right
+  become: true
+  become_user: root
+  ansible.builtin.command:
+    cmd: "chown -R draupnir:draupnir {{ draupnir_data_path }}"
+  when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"
+
+- name: Enable corepack
+  become: true
+  become_user: root
+  ansible.builtin.command:
+    cmd: "corepack enable"
+  changed_when: draupnir_git.changed
+
+- name: Yarn install
+  become: true
+  become_user: draupnir
+  ansible.builtin.command:
+    cmd: "yarn install"
+    chdir: "{{ draupnir_data_path }}/src"
+  changed_when: draupnir_git.changed
+
+- name: Yarn build
+  become: true
+  become_user: draupnir
+  ansible.builtin.command:
+    cmd: "yarn build"
+    chdir: "{{ draupnir_data_path }}/src"
+  changed_when: draupnir_git.changed
