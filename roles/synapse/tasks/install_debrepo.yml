@@ -30,14 +30,8 @@
 - name: Ensure synapse is installed
   ansible.builtin.apt:
     name: matrix-synapse-py3
-    state: present
-  when: not matrix_synapse_ensure_latest
+    state: "{{ 'latest' if matrix_synapse_ensure_latest else 'present' }}
 
-- name: Ensure synapse is latest
-  ansible.builtin.apt:
-      name: matrix-synapse-py3
-      state: latest
-  when: matrix_synapse_ensure_latest
 
 - name: Ensure redis in installed for workers
   ansible.builtin.apt:
