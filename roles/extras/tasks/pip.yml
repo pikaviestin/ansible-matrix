@@ -4,7 +4,7 @@
   ansible.builtin.pip:
     chdir: '/opt/{{ matrix_extra }}'
     name: "{{ pip_packages }}"
-    state: latest
+    state: "{{ 'latest' if matrix_extras_ensure_latest else 'present' }}"
     virtualenv: "/opt/{{ matrix_extra }}"
     virtualenv_python: '/usr/bin/python3'
   register: install
