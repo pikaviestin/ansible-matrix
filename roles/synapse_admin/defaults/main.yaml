@@ -1,0 +1,7 @@
+---
+synapse_admin_version: v0.10.3-etke37
+synapse_admin_install_method: nodejs
+synapse_admin_base_path: /opt/synapse-admin
+synapse_admin_user: "synapse-admin"
+synapse_admin_group: "synapse-admin"
+synapse_admin_config_path: "{{ matrix_synapse_admin_base_path }}/config"

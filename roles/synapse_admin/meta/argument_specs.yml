@@ -1,0 +1,42 @@
+---
+
+argument_specs:
+  main:
+    short_description: synapse admin
+    description: >
+      Installs and configures a synapse-admin application.
+      Supports installation via nodejs only.
+    options:
+      synapse_admin_install_method:
+        description: Installation method
+        type: str
+        required: false
+        default: nodejs
+        choices:
+          - nodejs
+      
+      synapse_admin_base_path:
+        description: The path to install to
+        type: str
+        required: false
+        default: /opt/synapse-admin
+
+      synapse_admin_user:
+       description: The user to run application as
+       type: str
+       required: false
+       default: synapse-admin
+      
+      synapse_admin_group:
+       description: The group to run application as
+       type: str
+       required: false
+       default: synapse-admin
+
+      synapse_admin_config_path:
+       description: The configuration path
+       type: str
+       required: false
+       default: /opt/synapse-admin/config
+      
+
