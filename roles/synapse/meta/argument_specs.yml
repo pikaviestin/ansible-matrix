@@ -64,6 +64,12 @@ argument_specs:
         type: str
         required: true
 
+      matrix_synapse_ensure_latest:
+        description: Whether to ensure synapse is the latest version
+        type: bool
+        required: false
+        default: false
+
       synapse_metrics:
         description: Whether to enable prometheus metrics listener on port 9656 and workers on worker port + 1000
         type: bool
