@@ -237,8 +237,7 @@ nginx_maps:
 
 
 nginx_servers:
-{% if synapse_monitor_hostname is defined %}
-  - name: "{{ synapse_monitor_hostname }}"
+  - name: "{{ synapse_monitor_hostname | default(inventory_hostname) }}"
     listen:
       - ip: "all"
         port: 8056
@@ -260,7 +259,6 @@ nginx_servers:
       - synapse_presence_persister
     reverse_proxy_map:
       - sync
-{% endif %}
   - listen:
       - ip: 'all'
       - ip: "{{ 'localhost' if matrix_extras is defined and synapse_workers is defined else '' }}"
