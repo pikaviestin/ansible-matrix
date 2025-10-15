@@ -4,6 +4,9 @@
 # Upstreams
 {% for upstream in nginx_upstreams | dict2items %}
 {% if upstream.value.servers | length != 0 %}
+{% if upstream.key == 'draupnir_report' and not (draupnir_abuse_reporting_enabled | default(false)) %}
+# Draupnir reporting is disabled
+{% else %}
 upstream {{ upstream.key }} {
 {% if upstream.value.method is defined %}
 	{{ upstream.value.method }};
@@ -18,12 +21,13 @@ upstream {{ upstream.key }} {
 }
 
 {% endif %}
+{% endif %}
 {% endfor %}
 {% endif %}
 
 {% if nginx_maps is defined %}
 {% for map in nginx_maps | dict2items %}
-{% if map.value.var | length != 0 %}
+{% if map.value.var | default('') | length != 0 %}
 map ${{ map.value.var }} ${{ map.key }} {
 {% for rule in map.value.rules | dict2items %}
 	{{ rule.key }} {{ rule.value }};
@@ -79,7 +83,7 @@ server {
 {% for return in server.return %}
 	location {{ return.location }} {
 		return {{ return.type | default('200') }} '{{ return.content | to_json if return.content_type | default('plain') == 'json' else return.content }}';
-{% if return.headers is mapping %}
+{% if return.headers is defined and return.headers is mapping %}
 {% for header in return.headers | dict2items %}
 		add_header {{ header.key }} {{ header.value }};
 {% endfor %}
@@ -88,24 +92,66 @@ server {
 {% endfor %}
 {% endif %}
 
+{% if server.custom_locations is defined %}
+# Custom locations
+{% for location in server.custom_locations %}
+{% if location.proxy_pass is defined and 'draupnir_report' in location.proxy_pass %}
+{% if draupnir_abuse_reporting_enabled | default(false) %}
+	location {{ location.name }} {
+{% if location.options is defined %}
+{% for option in location.options %}
+		{{ option }};
+{% endfor %}
+{% endif %}
+{% if location.headers is defined and location.headers is mapping %}
+{% for header in location.headers | dict2items %}
+		add_header {{ header.key }} {{ header.value }};
+{% endfor %}
+{% endif %}
+{% if location.proxy_pass is defined %}
+		proxy_pass {{ location.proxy_pass }};
+{% endif %}
+	}
+{% endif %}
+{% else %}
+	location {{ location.name }} {
+{% if location.options is defined %}
+{% for option in location.options %}
+		{{ option }};
+{% endfor %}
+{% endif %}
+{% if location.headers is defined and location.headers is mapping %}
+{% for header in location.headers | dict2items %}
+		add_header {{ header.key }} {{ header.value }};
+{% endfor %}
+{% endif %}
+{% if location.proxy_pass is defined %}
+		proxy_pass {{ location.proxy_pass }};
+{% endif %}
+	}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+
 {% if server.reverse_proxy is defined %}
 # Reverse proxy
 {% for upstream in server.reverse_proxy %}
-{% if nginx_upstreams[upstream].servers | length != 0 %}
+{% if nginx_upstreams[upstream].servers | default ([])| length != 0 %}
 
 # {{ upstream }}
 {% for location in nginx_upstreams[upstream].locations | default([{'name': '/'}]) %}
 
-{% if location.name | length != 0 %}
+{% if location.name | default('') | length != 0 %}
 	location {{ location.name }} {
 		proxy_pass http://{{ upstream }};
 		proxy_http_version 1.1;
-{% if location.proxy_headers is mapping %}
+{% if location.proxy_headers is defined and location.proxy_headers is mapping %}
 {% for header in location.proxy_headers | dict2items %}
 		proxy_set_header {{ header.key }} {{ header.value }};
 {% endfor %}
 {% endif %}
-{% if nginx_proxy_headers is mapping %}
+{% if nginx_proxy_headers is defined and nginx_proxy_headers is mapping %}
 {% for header in nginx_proxy_headers | dict2items %}
 {% if location.proxy_headers[header.key] is not defined %}
 		proxy_set_header {{ header.key }} {{ header.value }};

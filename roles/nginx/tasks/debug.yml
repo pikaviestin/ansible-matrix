@@ -1,0 +1,7 @@
+---
+- name: Debug nginx configuration
+  ansible.builtin.debug:
+      msg:
+      - "nginx_servers: {{ nginx_servers }}"
+  tags:
+   - debug
