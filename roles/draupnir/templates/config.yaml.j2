@@ -253,7 +253,7 @@ web:
   # and display readable abuse reports in the moderation room.
   #
   # If you wish to take advantage of this feature, you will need
-  # to configure a reverse proxy, see e.g. test/nginx.conf
+  # to configure a reverse proxy, see e.g., test/nginx.conf
   abuseReporting:
     # Whether to enable this feature.
     enabled: {{ draupnir_abuse_reporting_enabled | to_json }}
@@ -264,6 +264,6 @@ web:
 # isn't possible/practical.
 pollReports: {{ draupnir_poll_reports | to_json }}
 
-# Whether or not new reports, received either by webapi or polling,
+# Whether new reports, received either by webapi or polling,
 # should be printed to our managementRoom.
 displayReports: {{ draupnir_display_reports | to_json }}

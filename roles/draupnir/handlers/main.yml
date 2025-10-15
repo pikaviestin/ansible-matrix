@@ -6,6 +6,14 @@
     name: matrix-bot-draupnir.service
     enabled: true
 
+- name: draupnir build
+  become: true
+  become_user: draupnir
+  community.general.yarn:
+    command: build
+    chdir: "{{ draupnir_data_path }}/src"
+  notify: Restart bot draupnir
+
 - name: Restart bot draupnir
   ansible.builtin.systemd:
     name: matrix-bot-draupnir.service

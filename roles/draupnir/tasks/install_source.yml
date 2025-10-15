@@ -34,30 +34,17 @@
 
 - name: Make sure permissions are right
   become: true
-  become_user: root
-  ansible.builtin.command:
-    cmd: "chown -R draupnir:draupnir {{ draupnir_data_path }}"
+  ansible.builtin.file:
+    path: "{{ draupnir_data_path }}"
+    owner: draupnir
+    group: draupnir
   when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"
 
-- name: Enable corepack
-  become: true
-  become_user: root
-  ansible.builtin.command:
-    cmd: "corepack enable"
-  changed_when: draupnir_git.changed
-
-- name: Yarn install
+- name: Install draupnir dependencies
   become: true
   become_user: draupnir
-  ansible.builtin.command:
-    cmd: "yarn install"
+  community.general.yarn:
+    command: install
     chdir: "{{ draupnir_data_path }}/src"
-  changed_when: draupnir_git.changed
-
-- name: Yarn build
-  become: true
-  become_user: draupnir
-  ansible.builtin.command:
-    cmd: "yarn build"
-    chdir: "{{ draupnir_data_path }}/src"
-  changed_when: draupnir_git.changed
+  notify: draupnir build
+  when: draupnir_git.changed
