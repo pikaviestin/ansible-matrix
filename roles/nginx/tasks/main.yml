@@ -1,5 +1,9 @@
 ---
 
+#- import_tasks: debug.yml
+#  tags:
+#    - debug
+
 - name: Ensure nginx installed
   ansible.builtin.apt:
     name: nginx
