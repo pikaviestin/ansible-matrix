@@ -6,6 +6,8 @@ matrix_bridge_relaybot_user: "@relaybot:{{ matrix_domain }}"
 
 mautrix_whatsapp_web_name: 'Mautrix-WhatsApp bridge'
 
+matrix_extras_ensure_latest: false
+
 python_depends:
   - build-essential
   - python-setuptools
