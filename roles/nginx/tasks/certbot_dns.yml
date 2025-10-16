@@ -1,0 +1,21 @@
+---
+- name: Create DNS credentials file
+  ansible.builtin.template:
+    src: "dns/{{ dns_provider }}.ini.j2"
+    dest: "/etc/letsencrypt/dns-credentials/{{ dns_provider }}.ini"
+    mode: '0600'
+  no_log: true
+
+- name: Generate certificate using DNS challenge
+  ansible.builtin.command:
+    cmd: >
+      certbot certonly
+      --dns-{{ dns_provider }}
+      --dns-{{ dns_provider }}-credentials /etc/letsencrypt/dns-credentials/{{ dns_provider }}.ini
+      --agree-tos
+      --non-interactive
+      --email {{ certbot_admin_email }}
+      -d {{ ansible_fqdn }}
+      {{ '--staging' if certbot_staging | default(false) else '' }}
+    creates: "/etc/letsencrypt/live/{{ ansible_fqdn }}/fullchain.pem"
+  notify: Reload nginx

@@ -1,0 +1,13 @@
+---
+- name: Generate/renew certificate using HTTP challenge
+  ansible.builtin.command: >
+    certbot --nginx certonly
+    --non-interactive
+    --email {{ certbot_admin_email }}
+    --agree-tos
+    --expand
+    --domains {{ ansible_fqdn }}{% for server in nginx_servers %}{% if server.name is defined %},{{ server.name }}{% endif %}{% endfor %}
+    {{ '--staging' if certbot_staging | default(false) else '' }}
+  when: not cert.stat.exists or certbot_regenerate | default(false)
+  changed_when: true
+  notify: Reload nginx

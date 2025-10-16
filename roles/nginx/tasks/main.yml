@@ -16,7 +16,7 @@
   notify: Reload nginx
 
 - name: Set up certbot
-  ansible.builtin.include_tasks: certbot.yml
+  ansible.builtin.include_tasks: certificates.yml
   when: nginx_certbot
 
 - name: Ensure nginx configs in place
