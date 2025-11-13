@@ -23,7 +23,7 @@
   ansible.builtin.git:
     repo: "https://github.com/the-draupnir-project/Draupnir.git"
     # renovate: datasource=github-releases depName=the-draupnir-project/draupnir
-    version: "v2.2.0"
+    version: "v2.7.1"
     dest: "{{ draupnir_data_path }}/src"
   register: draupnir_git
 
@@ -43,8 +43,8 @@
 - name: Install draupnir dependencies
   become: true
   become_user: draupnir
-  community.general.yarn:
-    command: install
-    chdir: "{{ draupnir_data_path }}/src"
+  shell: |
+    cd {{ draupnir_data_path }}/src
+    yarn install
   notify: draupnir build
   when: draupnir_git.changed

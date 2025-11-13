@@ -9,9 +9,9 @@
 - name: draupnir build
   become: true
   become_user: draupnir
-  community.general.yarn:
-    command: build
-    chdir: "{{ draupnir_data_path }}/src"
+  shell: |
+    cd {{ draupnir_data_path }}/src
+    yarn build
   notify: Restart bot draupnir
 
 - name: Restart bot draupnir
