@@ -4,7 +4,6 @@ nginx_confs: []
 
 nginx_certbot: true
 certbot_regenerate: false
-nginx_certbot_use_dns_challenge: false
 
 nginx_proxy_headers:
   X-Forwarded-For: '$remote_addr'
