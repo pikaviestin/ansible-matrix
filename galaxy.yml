@@ -2,7 +2,7 @@
 namespace: pikaviestin
 name: matrix
 description: Matrix roles
-version: 0.3.5
+version: 0.3.6
 readme: README.md
 repository: https://github.com/pikaviestin/ansible-matrix
 license_file: LICENSE
