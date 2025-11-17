@@ -8,7 +8,7 @@
     suites: nodistro
     components: main
     signed_by: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
-  register: repositories
+  register: draupnir_repositories
 
 - name: Add nodejs preference
   ansible.builtin.copy:
@@ -17,4 +17,7 @@
       Pin: origin deb.nodesource.com
       Pin-Priority: 600
     dest: /etc/apt/preferences.d/nodejs
+    owner: root
+    group: root
+    mode: '0644'
   when: ansible_distribution != 'Ubuntu'

@@ -1,5 +1,4 @@
 ---
-
 - name: Include packages tasks for Debian
   ansible.builtin.include_tasks: packages_debian.yml
   when: ansible_os_family == 'Debian'

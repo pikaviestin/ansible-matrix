@@ -298,7 +298,7 @@ nginx_servers:
           Access-Control-Allow-Origin: "'*'"
           Access-Control-Allow-Credentials: "'true'"
           Access-Control-Allow-Methods: "'GET, POST, OPTIONS'"
-          Access-Control-Allow-Headers: "'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since'"
+          Access-Control-Allow-Headers: "'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since'"  # noqa yaml[line-length]
           Access-Control-Expose-Headers: "'Content-Length,Content-Range'"
           Access-Control-Max-Age: 1728000
         proxy_pass: "http://draupnir_report/api/1/report/$room_id/$event_id"

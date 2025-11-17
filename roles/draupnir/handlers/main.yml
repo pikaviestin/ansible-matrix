@@ -6,12 +6,14 @@
     name: matrix-bot-draupnir.service
     enabled: true
 
-- name: draupnir build
+- name: Draupnir build
   become: true
   become_user: draupnir
-  shell: |
+  ansible.builtin.shell: |
     cd {{ draupnir_data_path }}/src
     yarn build
+  register: draupnir_build_output
+  changed_when: "'built' in draupnir_build_output.stdout.lower()"
   notify: Restart bot draupnir
 
 - name: Restart bot draupnir

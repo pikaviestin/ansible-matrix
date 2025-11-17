@@ -38,13 +38,13 @@
     path: "{{ draupnir_data_path }}"
     owner: draupnir
     group: draupnir
-  when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"
+  changed_when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"
 
 - name: Install draupnir dependencies
   become: true
   become_user: draupnir
-  shell: |
+  ansible.builtin.shell: |
     cd {{ draupnir_data_path }}/src
     yarn install
   notify: draupnir build
-  when: draupnir_git.changed
+  changed_when: draupnir_git.changed
