@@ -15,15 +15,15 @@ argument_specs:
           - source
 
       draupnir_psql_user:
-        description: Postgres database username for synapse. Defaults to value from psql_dbs['matrix-bot-draupnir']['user']
+        description: Postgres database username for draupnir. Defaults to value from psql_dbs['matrix-bot-draupnir']['user']
         type: str
         required: false
       draupnir_psql_pw:
-        description: Postgres database password for synapse. Defaults to value from psql_dbs['matrix-bot-draupnir']['password']
+        description: Postgres database password for draupnir. Defaults to value from psql_dbs['matrix-bot-draupnir']['password']
         type: str
         required: false
       draupnir_psql_db:
-        description: Postgres database name for synapse
+        description: Postgres database name for draupnir
         type: str
         required: false
         default: "{{ draupnir_psql_user }}"
