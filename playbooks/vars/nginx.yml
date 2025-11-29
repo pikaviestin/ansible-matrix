@@ -13,7 +13,7 @@ nginx_upstreams:
           - "client_max_body_size {{ matrix_max_upload_size_mb }}M"
 
   draupnir_report:
-    servers: {{ ['127.0.0.1:' ~ draupnir_web_port | default('8082')] if draupnir_abuse_reporting_enabled else [] }}
+    servers: "{{ ['127.0.0.1:' ~ draupnir_web_port | default('8082')] if draupnir_abuse_reporting_enabled else [] }}"
 
   synapse_admin:
     # Idea behind this is that the draupnir bot needs access to the admin API
