@@ -9,9 +9,9 @@
 - name: Draupnir build
   become: true
   become_user: draupnir
-  ansible.builtin.shell: |
-    cd {{ draupnir_data_path }}/src
-    yarn build
+  ansible.builtin.command:
+    cmd: yarn build
+    chdir: "{{ draupnir_data_path }}/src"
   register: draupnir_build_output
   changed_when: "'built' in draupnir_build_output.stdout.lower()"
   notify: Restart bot draupnir
