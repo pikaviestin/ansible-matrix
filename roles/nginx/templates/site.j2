@@ -26,7 +26,7 @@ upstream {{ upstream.key }} {
 
 {% if nginx_maps is defined %}
 {% for map in nginx_maps | dict2items %}
-{% if map.value.var | default('') | length != 0 %}
+{% if map.value.var | length != 0 %}
 map ${{ map.value.var }} ${{ map.key }} {
 {% for rule in map.value.rules | dict2items %}
 	{{ rule.key }} {{ rule.value }};
