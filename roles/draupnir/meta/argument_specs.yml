@@ -47,7 +47,6 @@ argument_specs:
         description: Matrix homeserver URL
         type: str
         required: false
-        default: "{{ matrix_external_url }}"
 
       draupnir_raw_homeserver_url:
         description: Matrix homeserver URL with _admin exposed
