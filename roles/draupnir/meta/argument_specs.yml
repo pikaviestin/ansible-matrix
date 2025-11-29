@@ -60,7 +60,7 @@ argument_specs:
         required: true
 
       draupnir_management_room:
-        description: Management room ID in !room@domain format or alias
+        description: Management room ID in !room:domain format or alias
         type: str
         required: true
 
