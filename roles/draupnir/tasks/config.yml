@@ -1,10 +1,5 @@
 ---
 
-- name: Check if data dir exists
-  ansible.builtin.stat:
-    path: "{{ draupnir_data_path }}/data"
-  register: draupnir_dir_stat
-
 - name: Create directory if it does not exist
   ansible.builtin.file:
     path: "{{ draupnir_data_path }}/data"
@@ -12,7 +7,6 @@
     owner: draupnir
     group: draupnir
     mode: '0755'
-  when: not draupnir_dir_stat.stat.exists
 
 - name: Copy configuration file
   ansible.builtin.template:
