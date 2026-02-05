@@ -26,6 +26,9 @@
     version: "v2.7.1"
     dest: "{{ draupnir_data_path }}/src"
   register: draupnir_git
+  notify:
+    - draupnir install
+    - draupnir build
 
 - name: Check current permissions
   ansible.builtin.stat:
@@ -39,12 +42,3 @@
     owner: draupnir
     group: draupnir
   changed_when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"
-
-- name: Install draupnir dependencies
-  become: true
-  become_user: draupnir
-  ansible.builtin.shell: |
-    cd {{ draupnir_data_path }}/src
-    yarn install
-  notify: draupnir build
-  changed_when: draupnir_git.changed
