@@ -4,8 +4,6 @@
 # Upstreams
 {% for upstream in nginx_upstreams | dict2items %}
 {% if upstream.value.servers | length != 0 %}
-{% if upstream.key == 'draupnir_report' and not (draupnir_abuse_reporting_enabled | default(false)) %}
-{% else %}
 upstream {{ upstream.key }} {
 {% if upstream.value.method is defined %}
 	{{ upstream.value.method }};
