@@ -1,4 +1,9 @@
 ---
+- name: only debian supported
+  fail:
+   msg: 'Currently only Debian is supported'
+  when: not ansible_os_family == 'Debian'
+
 - name: Include packages tasks for Debian
   ansible.builtin.include_tasks: packages_debian.yml
   when: ansible_os_family == 'Debian'
