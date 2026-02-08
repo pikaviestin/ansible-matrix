@@ -1,5 +1,4 @@
 ---
-
 - name: Config bot draupnir service
   ansible.builtin.systemd:
     daemon_reload: true

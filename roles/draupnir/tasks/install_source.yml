@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure draupnir dependencies are installed
   ansible.builtin.apt:
     name:
@@ -15,7 +14,6 @@
     home: "{{ draupnir_data_path }}"
     system: true
     create_home: true
-
 
 - name: Clone the source code
   become: true

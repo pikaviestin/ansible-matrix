@@ -1,5 +1,4 @@
 ---
-
 - name: Add deb.nodesource.com repository
   ansible.builtin.deb822_repository:
     name: nodesource
@@ -19,5 +18,5 @@
     dest: /etc/apt/preferences.d/nodejs
     owner: root
     group: root
-    mode: '0644'
+    mode: "0644"
   when: ansible_distribution != 'Ubuntu'

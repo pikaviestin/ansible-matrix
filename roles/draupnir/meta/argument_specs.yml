@@ -4,7 +4,7 @@ argument_specs:
   main:
     short_description: Moderator bot for Matrix (Draupnir)
     description: >
-        Installs and configures a Draupnir bot for Matrix. Supports installation from source.
+      Installs and configures a Draupnir bot for Matrix. Supports installation from source.
     options:
       draupnir_install_method:
         description: Installation method
@@ -33,7 +33,6 @@ argument_specs:
         required: false
         default: localhost
 
-
       draupnir_log_level:
         description: Bot log level
         type: str
@@ -60,14 +59,14 @@ argument_specs:
         required: true
 
       draupnir_management_room:
-        description: Management room ID (e.g. !longstring) or alias (e.g. #room:domain)
+        description: Management room ID (e.g. !longstring) or alias
         type: str
         required: true
 
       draupnir_disable_server_acl:
         description: |
-         Disables server ACL
-         DO NOT change this to `true` unless you are very confident that you know what you are doing.
+          Disables server ACL
+          DO NOT change this to `true` unless you are very confident that you know what you are doing.
         type: bool
         required: false
         default: false

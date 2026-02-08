@@ -1,7 +1,7 @@
 ---
-- name: only debian supported
-  fail:
-   msg: 'Currently only Debian is supported'
+- name: Only debian supported
+  ansible.builtin.fail:
+    msg: "Currently only Debian is supported"
   when: not ansible_os_family == 'Debian'
 
 - name: Include packages tasks for Debian
@@ -18,6 +18,6 @@
   ansible.builtin.template:
     src: systemd/matrix-bot-draupnir.service.j2
     dest: /etc/systemd/system/matrix-bot-draupnir.service
-    mode: '0644'
+    mode: "0644"
   notify:
     - Config bot draupnir service
