@@ -1,0 +1,22 @@
+---
+
+draupnir_abuse_reporting_enabled: false
+draupnir_data_path: /opt/draupnir/data
+draupnir_install_method: source
+draupnir_web_enabled: "{{ draupnir_abuse_reporting_enabled }}"
+draupnir_web_port: 8080
+draupnir_web_bind_address: "127.0.0.1"
+draupnir_display_reports: "{{ draupnir_abuse_reporting_enabled }}"
+draupnir_log_level: "INFO"
+draupnir_disable_server_acl: false
+draupnir_poll_reports: false
+draupnir_enable_room_state_backing_store: false
+draupnir_enable_experimental_rust_crypto: false
+
+draupnir_psql_host: localhost
+draupnir_psql_user: "{{ psql_dbs['draupnir']['user'] }}"
+draupnir_psql_pw: "{{ psql_dbs['draupnir']['password'] }}"
+draupnir_psql_db: "{{ draupnir_psql_db }}"
+
+draupnir_homeserver_url: "{{ matrix_external_url }}"
+draupnir_raw_homeserver_url: "http://localhost:8009"

@@ -1,0 +1,17 @@
+---
+- name: Create directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ draupnir_data_path }}/data"
+    state: directory
+    owner: draupnir
+    group: draupnir
+    mode: "0755"
+
+- name: Copy configuration file
+  ansible.builtin.template:
+    src: "config.yaml.j2"
+    user: draupnir
+    group: draupnir
+    mode: "0644"
+    dest: "{{ draupnir_data_path }}/data/config.yaml"
+  tags: config

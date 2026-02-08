@@ -1,0 +1,42 @@
+---
+- name: Ensure draupnir dependencies are installed
+  ansible.builtin.apt:
+    name:
+      - yarn
+      - nodejs
+    update_cache: true
+    state: present
+
+- name: Create user
+  ansible.builtin.user:
+    name: draupnir
+    shell: /usr/sbin/nologin
+    home: "{{ draupnir_data_path }}"
+    system: true
+    create_home: true
+
+- name: Clone the source code
+  become: true
+  become_user: draupnir
+  ansible.builtin.git:
+    repo: "https://github.com/the-draupnir-project/Draupnir.git"
+    # renovate: datasource=github-releases depName=the-draupnir-project/draupnir
+    version: "v2.7.1"
+    dest: "{{ draupnir_data_path }}/src"
+  register: draupnir_git
+  notify:
+    - draupnir install
+    - draupnir build
+
+- name: Check current permissions
+  ansible.builtin.stat:
+    path: "{{ draupnir_data_path }}"
+  register: draupnir_stat
+
+- name: Make sure permissions are right
+  become: true
+  ansible.builtin.file:
+    path: "{{ draupnir_data_path }}"
+    owner: draupnir
+    group: draupnir
+  changed_when: draupnir_stat.stat.pw_name != "draupnir" or draupnir_stat.stat.gr_name != "draupnir"

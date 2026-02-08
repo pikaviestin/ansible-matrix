@@ -1,0 +1,23 @@
+---
+- name: Only debian supported
+  ansible.builtin.fail:
+    msg: "Currently only Debian is supported"
+  when: not ansible_os_family == 'Debian'
+
+- name: Include packages tasks for Debian
+  ansible.builtin.include_tasks: packages_debian.yml
+  when: ansible_os_family == 'Debian'
+
+- name: Include bot installation tasks
+  ansible.builtin.include_tasks: "install_{{ draupnir_install_method }}.yml"
+
+- name: Include bot configuration tasks
+  ansible.builtin.import_tasks: config.yml
+
+- name: Ensure bot systemd units in place
+  ansible.builtin.template:
+    src: systemd/matrix-bot-draupnir.service.j2
+    dest: /etc/systemd/system/matrix-bot-draupnir.service
+    mode: "0644"
+  notify:
+    - Config bot draupnir service

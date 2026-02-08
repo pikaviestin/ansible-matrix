@@ -1,0 +1,22 @@
+---
+- name: Add deb.nodesource.com repository
+  ansible.builtin.deb822_repository:
+    name: nodesource
+    types: deb
+    uris: https://deb.nodesource.com/node_20.x
+    suites: nodistro
+    components: main
+    signed_by: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+  register: draupnir_repositories
+
+- name: Add nodejs preference
+  ansible.builtin.copy:
+    content: |
+      Package: nodejs
+      Pin: origin deb.nodesource.com
+      Pin-Priority: 600
+    dest: /etc/apt/preferences.d/nodejs
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_distribution != 'Ubuntu'
