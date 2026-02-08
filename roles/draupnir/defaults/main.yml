@@ -19,4 +19,4 @@ draupnir_psql_pw: "{{ psql_dbs['draupnir']['password'] }}"
 draupnir_psql_db: "{{ draupnir_psql_db }}"
 
 draupnir_homeserver_url: "{{ matrix_external_url }}"
-draupnir_raw_homeserver_url: "http://localhost:8008"
+draupnir_raw_homeserver_url: "http://localhost:8009"
