@@ -1,0 +1,1 @@
+Sets up matrix authenication service (MAS) configs 
