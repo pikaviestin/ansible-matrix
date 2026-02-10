@@ -1,0 +1,120 @@
+---
+
+argument_specs:
+  main:
+    short_description: Moderator bot for Matrix (Draupnir)
+    description: >
+      Installs and configures a Draupnir bot for Matrix. Supports installation from source.
+    options:
+      draupnir_install_method:
+        description: Installation method
+        type: str
+        required: false
+        default: source
+        choices:
+          - source
+
+      draupnir_psql_user:
+        description: Postgres database username for draupnir. Defaults to value from psql_dbs['matrix-bot-draupnir']['user']
+        type: str
+        required: false
+      draupnir_psql_pw:
+        description: Postgres database password for draupnir. Defaults to value from psql_dbs['matrix-bot-draupnir']['password']
+        type: str
+        required: false
+      draupnir_psql_db:
+        description: Postgres database name for draupnir
+        type: str
+        required: false
+        default: "{{ draupnir_psql_user }}"
+      draupnir_psql_host:
+        description: Postgres database server hostname
+        type: str
+        required: false
+        default: localhost
+
+      draupnir_log_level:
+        description: Bot log level
+        type: str
+        choices:
+          - DEBUG
+          - INFO
+        required: false
+        default: INFO
+
+      draupnir_homeserver_url:
+        description: Matrix homeserver URL
+        type: str
+        required: false
+
+      draupnir_raw_homeserver_url:
+        description: Matrix homeserver URL with _admin exposed
+        type: str
+        required: false
+        default: "http://localhost:8008"
+
+      draupnir_access_token:
+        description: Bot access token
+        type: str
+        required: true
+
+      draupnir_management_room:
+        description: Management room ID (e.g. !longstring) or alias
+        type: str
+        required: true
+
+      draupnir_disable_server_acl:
+        description: |
+          Disables server ACL
+          DO NOT change this to `true` unless you are very confident that you know what you are doing.
+        type: bool
+        required: false
+        default: false
+
+      draupnir_enable_room_state_backing_store:
+        description: Enable room state backing store
+        type: bool
+        required: false
+        default: false
+
+      draupnir_enable_experimental_rust_crypto:
+        description: Enable experimental Rust crypto
+        type: bool
+        required: false
+        default: false
+
+      draupnir_abuse_reporting_enabled:
+        description: Enable abuse reporting
+        type: bool
+        required: false
+        default: false
+
+      draupnir_web_enabled:
+        description: Enable web interface
+        type: bool
+        required: false
+        default: "{{ draupnir_abuse_reporting_enabled }}"
+
+      raupnir_display_reports:
+        description: Display abuse reports
+        type: bool
+        required: false
+        default: "{{ draupnir_abuse_reporting_enabled }}"
+
+      draupnir_web_bind_address:
+        description: Web interface bind address
+        type: str
+        required: false
+        default: "127.0.0.1"
+
+      draupnir_web_port:
+        description: Web interface port
+        type: int
+        required: false
+        default: 8080
+
+      draupnir_data_path:
+        description: Path to store bot data
+        type: str
+        required: false
+        default: /opt/draupnir/data

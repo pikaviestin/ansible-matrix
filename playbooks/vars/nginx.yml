@@ -12,6 +12,20 @@ nginx_upstreams:
         additional_options:
           - "client_max_body_size {{ matrix_max_upload_size_mb }}M"
 
+  draupnir_report:
+    servers: "{{ ['127.0.0.1:' ~ draupnir_web_port | default('8082')] if draupnir_abuse_reporting_enabled else [] }}"
+
+  synapse_admin:
+    # Idea behind this is that the draupnir bot needs access to the admin API
+    servers:
+      - 8008
+    locations:
+      - name: '/_matrix'
+      - name: '/_synapse'
+      - name: "{{ '/_matrix/media/' if matrix_media_repo_server is not defined and 'media_repository' not in synapse_workers | default('') else '' }}"
+        additional_options:
+          - "client_max_body_size {{ matrix_max_upload_size_mb }}M"
+
   matrix_media_repo:
     servers:
       - "{{ matrix_media_repo_server + ':9000' if matrix_media_repo_server is defined else '' }}"
@@ -225,7 +239,31 @@ nginx_maps:
       "'~Bearer syt_(?<username>.*?)_.*'": $username
       "''": $mxid_localpart_urlparam
 
+
 nginx_servers:
+  - name: "{{ synapse_monitor_hostname | default(inventory_hostname) }}"
+    enabled: "{{ synapse_monitor_enabled | default(false) }}"
+    listen:
+      - ip: "{{ synapse_monitor_listen_ip | default('all') }}"
+        port: 8056
+    reverse_proxy:
+      - synapse_admin
+      - matrix_media_repo
+      - synapse_media_repository
+      - synapse_generic_sync
+      - synapse_generic_init_sync
+      - synapse_generic_client
+      - synapse_generic_login
+      - synapse_generic_event_send
+      - synapse_generic_pagination
+      - synapse_user_dir
+      - synapse_device_persister
+      - synapse_typing_persister
+      - synapse_account_persister
+      - synapse_receipt_persister
+      - synapse_presence_persister
+    reverse_proxy_map:
+      - sync
   - listen:
       - ip: 'all'
       - ip: "{{ 'localhost' if matrix_extras is defined and synapse_workers is defined else '' }}"
@@ -249,6 +287,26 @@ nginx_servers:
 
         headers:
           Access-Control-Allow-Origin: "'*'"
+    custom_locations:
+      - name: '~ ^/_matrix/client/(r0|v3)/rooms/([^/]*)/report/(.*)$'
+        options:
+          - "mirror /report_mirror"
+          - "set $room_id $2"
+          - "set $event_id $3"
+        headers:
+          Access-Control-Allow-Origin: "'*'"
+          Access-Control-Allow-Credentials: "'true'"
+          Access-Control-Allow-Methods: "'GET, POST, OPTIONS'"
+          Access-Control-Allow-Headers: "'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,Keep-Alive,X-Requested-With,If-Modified-Since'"  # noqa yaml[line-length]
+          Access-Control-Expose-Headers: "'Content-Length,Content-Range'"
+          Access-Control-Max-Age: 1728000
+        proxy_pass: "http://draupnir_report/api/1/report/$room_id/$event_id"
+
+      - name: '/report_mirror'
+        options:
+          - "internal"
+        proxy_pass: "http://synapse_main$request_uri"
+
     reverse_proxy:
       - synapse_main
       - matrix_media_repo

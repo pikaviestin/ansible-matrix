@@ -1,0 +1,29 @@
+---
+- name: Config bot draupnir service
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: matrix-bot-draupnir.service
+    enabled: true
+
+- name: Draupnir install
+  become: true
+  become_user: draupnir
+  ansible.builtin.command:
+    cmd: yarn install
+    chdir: "{{ draupnir_data_path }}/src"
+  changed_when: true
+
+- name: Draupnir build
+  become: true
+  become_user: draupnir
+  ansible.builtin.command:
+    cmd: yarn build
+    chdir: "{{ draupnir_data_path }}/src"
+  register: draupnir_build_output
+  changed_when: "'built' in draupnir_build_output.stdout.lower()"
+  notify: Restart bot draupnir
+
+- name: Restart bot draupnir
+  ansible.builtin.systemd:
+    name: matrix-bot-draupnir.service
+    state: restarted
