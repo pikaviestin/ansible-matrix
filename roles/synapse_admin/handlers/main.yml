@@ -1,0 +1,10 @@
+---
+
+- name: Reload systemd daemon
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Restart synapse-admin
+  ansible.builtin.systemd:
+    name: synapse-admin
+    state: restarted
