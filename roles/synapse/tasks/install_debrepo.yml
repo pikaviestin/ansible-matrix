@@ -37,7 +37,6 @@
   ansible.builtin.apt:
     update_cache: true
   when: synapse_matrix_org_repo is changed
->>>>>>> master
 
 - name: Ensure synapse is installed
   ansible.builtin.apt:
