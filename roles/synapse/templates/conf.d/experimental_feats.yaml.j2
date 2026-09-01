@@ -1,0 +1,24 @@
+experimental_features:
+  # Appservice E2(B)E support, Used by: Hookshot MAS, Meowlnir...
+  # https://matrix-org.github.io/matrix-hookshot/latest/advanced/encryption.html
+  msc3202_device_masquerading: true
+  msc3202_transaction_extensions: true
+  msc2409_to_device_messages_enabled: true
+
+  # Element-Call needs these
+  # MSC3266: Room summary API. Used for knocking over federation
+  msc3266_enabled: true
+  msc4190_enabled: true
+
+  # QR-code login
+  msc4108_enabled: true
+
+  # MSC4222 needed for syncv2 state_after. This allow clients to
+  # correctly track the state of the room.
+  msc4222_enabled: true
+
+  # Mainly for getting "pings" from encrypted rooms
+  msc4028_push_encrypted_events: true
+
+# enable delayed events, so we quit calls that are interrupted somehow
+max_event_delay_duration: 24h

@@ -1,0 +1,5 @@
+---
+
+- name: Include matrix-mas configuration tasks
+  ansible.builtin.import_tasks: config.yml
+

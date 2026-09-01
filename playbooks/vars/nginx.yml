@@ -2,6 +2,18 @@
 
 # Worker endpoints last updated on 2023-07-18
 nginx_upstreams:
+  mas:
+    servers: "{{ ['127.0.0.1:' ~ mas_port | default('8007')] if mas_enabled else [] }}"
+    locations:
+      - name: '~ ^/_matrix/client/(.*)/(login|logout|refresh)'
+
+
+  mas_main:
+    servers: "{{ ['127.0.0.1:' ~ mas_port | default('8007')] if mas_enabled else [] }}"
+    locations:
+      - name: '/'
+
+
   synapse_main:
     servers:
       - 8008
@@ -91,13 +103,13 @@ nginx_upstreams:
   synapse_generic_login:
     servers: "{{ synapse_workers.generic_login | default('') }}"
     locations:
-      - name: '~ ^/_matrix/client/(api/v1|r0|unstable|v3)/login$'
+#      - name: '~ ^/_matrix/client/(api/v1|r0|unstable|v3)/login$'
       - name: '~ ^/_matrix/client/(r0|unstable|v3)/register$'
       - name: '~ ^/_matrix/client/(r0|v3|unstable)/register/available$'
       - name: '~ ^/_matrix/client/v1/register/m.login.registration_token/validity$'
       - name: '~ ^/_matrix/client/(r0|v3|unstable)/password_policy$'
       # SSO
-      - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/login/sso/redirect'
+#      - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/login/sso/redirect'
       - name: '~ ^/_synapse/client/pick_idp$'
       - name: '~ ^/_synapse/client/pick_username'
       - name: '~ ^/_synapse/client/new_user_consent$'
@@ -107,7 +119,7 @@ nginx_upstreams:
       # SAML
       - name: '~ ^/_synapse/client/saml2/authn_response$'
       # CAS
-      - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/login/cas/ticket$'
+#      - name: '~ ^/_matrix/client/(api/v1|r0|v3|unstable)/login/cas/ticket$'
   synapse_generic_federation:
     servers: "{{ synapse_workers.generic_federation | default('') }}"
     locations:
@@ -309,6 +321,7 @@ nginx_servers:
 
     reverse_proxy:
       - synapse_main
+      - mas
       - matrix_media_repo
       - synapse_media_repository
       - synapse_generic_sync
@@ -338,6 +351,12 @@ nginx_servers:
       - synapse_media_repository
       - synapse_generic_federation
       - synapse_generic_federation_send
+  - name: "{{ mas_domain }}"
+    enabled: "{{ mas_enabled | default(false) }}"
+    listen:
+      - ip: 'all'
+    reverse_proxy:
+      - mas_main
   - name: "{{ matrix_domain }}"
     enabled: "{{ matrix_serve_wellknown_on_matrix_domain | default(false) }}"
     return:
