@@ -1,0 +1,92 @@
+---
+
+- name: Ensure MAS legacy backup directory exists
+  ansible.builtin.file:
+    path: "{{ mas_legacy_backup_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Back up the previous MAS config
+  ansible.builtin.copy:
+    src: "{{ mas_config_path }}/config.yaml"
+    dest: "{{ mas_legacy_backup_path }}/config.yaml"
+    remote_src: true
+    force: false
+    owner: root
+    group: root
+    mode: '0600'
+  when: mas_legacy_config
+
+- name: Read the encryption secret file referenced by the previous MAS config
+  ansible.builtin.slurp:
+    src: "{{ item.path }}"
+  loop:
+    - name: encryption
+      path: "{{ mas_existing_config.secrets.encryption_file | default('') }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: mas_legacy_config and item.path | length > 0
+  register: mas_legacy_secret_files
+  no_log: "{{ mas_no_log }}"
+
+- name: Inline the encryption secret of the previous MAS config
+  ansible.builtin.set_fact:
+    mas_existing_config: >-
+      {{ mas_existing_config | combine({'secrets': {'encryption':
+           (mas_legacy_secret_files.results | selectattr('item.name', 'equalto', 'encryption')
+            | selectattr('content', 'defined') | map(attribute='content') | first | b64decode | trim)}},
+         recursive=true) }}
+  when: mas_legacy_config and mas_existing_config.secrets.encryption_file is defined
+  no_log: "{{ mas_no_log }}"
+
+- name: Build the preserved part of the previous MAS config
+  ansible.builtin.set_fact:
+    mas_legacy_preserved: >-
+      {%- set text = mas_existing_config_text -%}
+      {%- if mas_legacy_private_target is defined -%}
+      {%-   set text = text | replace(mas_legacy_private_target | regex_replace('/+$', '') ~ '/', mas_private_path ~ '/') -%}
+      {%- endif -%}
+      {%- set cfg = text | from_yaml -%}
+      {%- set out = cfg | dict2items | rejectattr('key', 'in', mas_managed_sections + ['secrets', 'policy']) | items2dict -%}
+      {%- if cfg.secrets is mapping and 'keys' in cfg.secrets -%}
+      {%-   set out = out | combine({'secrets': {'keys': cfg.secrets['keys']}}) -%}
+      {%- endif -%}
+      {%- if cfg.policy is defined -%}
+      {%-   set policy = cfg.policy | dict2items | rejectattr('key', 'equalto', 'wasm_module') | items2dict -%}
+      {%-   if policy | length > 0 -%}
+      {%-     set out = out | combine({'policy': policy}) -%}
+      {%-   endif -%}
+      {%- endif -%}
+      {{ out }}
+  when: mas_legacy_config and mas_legacy_preserve_config | bool
+  no_log: "{{ mas_no_log }}"
+
+- name: Find files referenced by the preserved MAS config outside the mounted directory
+  ansible.builtin.set_fact:
+    mas_legacy_unmounted_files: >-
+      {{ mas_legacy_preserved | to_json
+         | regex_findall('"[a-z_]*(?:_file|_path|path)": "(/[^"]+)"')
+         | reject('match', '^' ~ (mas_config_path | regex_escape) ~ '/')
+         | reject('in', mas_container_extra_volumes | map('split', ':') | map('first') | list)
+         | list }}
+  when: mas_legacy_preserved is defined
+
+- name: Fail when the preserved MAS config references files the container cannot see
+  ansible.builtin.fail:
+    msg: >-
+      The previous MAS config references files outside {{ mas_config_path }}:
+      {{ mas_legacy_unmounted_files | join(', ') }}. Move them under {{ mas_config_path }}
+      and update the config, or mount them with mas_container_extra_volumes.
+  when: mas_legacy_unmounted_files | default([]) | length > 0
+
+- name: Save the preserved part of the previous MAS config
+  ansible.builtin.copy:
+    content: "{{ mas_legacy_preserved | to_nice_yaml(indent=2, width=1000) }}"
+    dest: "{{ mas_legacy_config_file }}"
+    owner: root
+    group: "{{ mas_container_uid }}"
+    mode: '0640'
+  when: mas_legacy_preserved is defined
+  no_log: "{{ mas_no_log }}"

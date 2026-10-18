@@ -1,0 +1,46 @@
+---
+
+- name: Check for an existing MAS config
+  ansible.builtin.stat:
+    path: "{{ mas_config_path }}/config.yaml"
+  register: mas_config_stat
+
+- name: Read the existing MAS config
+  ansible.builtin.slurp:
+    src: "{{ mas_config_path }}/config.yaml"
+  register: mas_config_slurp
+  when: mas_config_stat.stat.exists
+  no_log: "{{ mas_no_log }}"
+
+- name: Parse the existing MAS config
+  ansible.builtin.set_fact:
+    mas_existing_config_text: "{{ mas_config_slurp.content | b64decode if mas_config_stat.stat.exists else '' }}"
+    mas_existing_config: "{{ (mas_config_slurp.content | b64decode | from_yaml) if mas_config_stat.stat.exists else {} }}"
+  no_log: "{{ mas_no_log }}"
+
+- name: Check for unit files of a previous MAS install
+  ansible.builtin.stat:
+    path: "{{ item.0 }}/{{ item.1 }}"
+  loop: "{{ mas_systemd_unit_dirs | product(mas_legacy_service_names) | list }}"
+  loop_control:
+    label: "{{ item.0 }}/{{ item.1 }}"
+  register: mas_legacy_unit_stats
+
+- name: Set MAS install state facts
+  ansible.builtin.set_fact:
+    mas_legacy_units: >-
+      {{ mas_legacy_unit_stats.results | selectattr('stat.exists') | map(attribute='item')
+         | map('join', '/') | list }}
+    mas_legacy_config: >-
+      {{ mas_config_stat.stat.exists and not mas_existing_config_text.startswith(mas_config_marker) }}
+
+- name: Set MAS legacy install fact
+  ansible.builtin.set_fact:
+    mas_legacy_install: "{{ mas_legacy_config or mas_legacy_units | length > 0 }}"
+
+- name: Report previous MAS install
+  ansible.builtin.debug:
+    msg: >-
+      Found a MAS install not managed by this role (config: {{ mas_legacy_config }},
+      units: {{ mas_legacy_units | join(', ') or 'none' }}). It will be migrated to the container.
+  when: mas_legacy_install

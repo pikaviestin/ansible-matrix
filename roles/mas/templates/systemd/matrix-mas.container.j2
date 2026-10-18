@@ -11,6 +11,9 @@ ContainerName={{ mas_container_name }}
 Image={{ mas_container_image }}
 Network={{ mas_container_network }}
 Volume={{ mas_config_path }}:{{ mas_config_path }}:ro
+{% for volume in mas_container_extra_volumes %}
+Volume={{ volume }}
+{% endfor %}
 Exec=server --config {{ mas_config_path }}/config.yaml
 
 [Service]

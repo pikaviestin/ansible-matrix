@@ -5,170 +5,190 @@ argument_specs:
     short_description: Matrix Authentication Service (MAS)
     description: >
       Installs and configures matrix-authentication-service as a podman container
-      managed by systemd (quadlet), and generates its configuration.
+      managed by systemd (quadlet). Migrates an existing non-container MAS install
+      (binary + systemd unit) in place, keeping its secrets, signing keys and config.
     options:
       mas_enabled:
-        description: Whether to deploy MAS at all. The role does nothing when false.
+        description: Whether to deploy MAS. The role does nothing when false.
         type: bool
-        required: false
         default: false
       mas_install_method:
         description: Installation method
         type: str
-        required: false
         default: podman
         choices:
           - podman
 
       mas_domain:
-        description: Public hostname MAS is served on (e.g. auth.example.org)
+        description: Public hostname MAS is served on. Required when mas_enabled is true.
         type: str
-        required: true
       mas_public_base:
-        description: Public base URL of MAS
+        description: Public base URL of MAS. Defaults to https://<mas_domain>/.
         type: str
-        required: false
-        default: "https://{{ mas_domain }}/"
       mas_issuer:
-        description: OIDC issuer URL. Changing it after first start breaks existing sessions.
+        description: OIDC issuer URL. Defaults to mas_public_base.
         type: str
-        required: false
-        default: "{{ mas_public_base }}"
+      mas_issuer_allow_change:
+        description: Allow changing the issuer of an existing install, which logs out everybody
+        type: bool
+        default: false
+
+      mas_host_packages:
+        description: Packages installed on the host (podman and python3-cryptography on Debian)
+        type: list
+        elements: str
+        default:
+          - podman
+          - python3-cryptography
 
       mas_version:
-        description: MAS release to run
+        description: MAS release to run. Must not be older than a migrated install.
         type: str
-        required: false
         default: "1.27.0"
       mas_container_image:
-        description: Container image to run
+        description: Container image to run. Defaults to ghcr.io/element-hq/matrix-authentication-service:<mas_version>.
         type: str
-        required: false
-        default: "ghcr.io/element-hq/matrix-authentication-service:{{ mas_version }}"
       mas_container_name:
         description: Container and systemd unit name
         type: str
-        required: false
         default: matrix-mas
       mas_container_network:
         description: Podman network mode for the container
         type: str
-        required: false
         default: host
       mas_container_uid:
         description: UID the image runs as, used to make config files readable inside the container
         type: int
-        required: false
         default: 65532
       mas_container_timeout_start_sec:
         description: systemd TimeoutStartSec for the container (covers image pull)
         type: int
-        required: false
         default: 300
+      mas_container_extra_volumes:
+        description: Extra podman volumes as "host:container[:options]"
+        type: list
+        elements: str
+        default: []
 
       mas_config_path:
-        description: Directory for MAS configuration, bind mounted into the container
+        description: Directory for MAS configuration, bind mounted read only into the container
         type: str
-        required: false
         default: /etc/matrix-mas
+      mas_private_path:
+        description: Directory for keys. A symlink here (old layout) is replaced by a real directory. Defaults to <mas_config_path>/private.
+        type: str
       mas_signing_key_file:
-        description: Path of the RSA signing key, generated if missing
+        description: Path of the RSA signing key generated on fresh installs. Defaults to <mas_private_path>/signing.key.
         type: str
-        required: false
-        default: "{{ mas_config_path }}/private/signing.key"
       mas_signing_key_id:
-        description: Key id (kid) of the signing key
+        description: Key id (kid) of the generated signing key
         type: str
-        required: false
         default: rsa-01
 
       mas_bind_address:
         description: Address MAS listeners bind to
         type: str
-        required: false
         default: 127.0.0.1
       mas_port:
         description: Port for the public MAS listener, proxied by nginx
         type: int
-        required: false
         default: 8007
       mas_internal_port:
         description: Port for the internal health listener
         type: int
-        required: false
         default: 8081
       mas_trusted_proxies:
         description: Reverse proxies whose X-Forwarded-For is trusted
         type: list
         elements: str
-        required: false
         default: ["127.0.0.1/8", "::1/128"]
 
       mas_matrix_homeserver:
-        description: Matrix server name
+        description: Matrix server name. Defaults to matrix_domain.
         type: str
-        required: false
-        default: "{{ matrix_domain }}"
       mas_synapse_endpoint:
         description: URL MAS uses to reach synapse
         type: str
-        required: false
         default: http://localhost:8008/
       mas_shared_secret:
-        description: Secret shared between MAS and synapse (matrix_authentication_service.secret in synapse)
+        description: >
+          Secret shared between MAS and synapse. Required when mas_enabled is true.
+          The synapse role writes the same value into sso.yaml.
         type: str
-        required: true
       mas_encryption_secret:
-        description: 32 byte hex encoded encryption secret (secrets.encryption). Must never change.
+        description: >
+          64 hex chars (secrets.encryption). Empty keeps the one in the existing config
+          or generates one on a fresh install.
         type: str
-        required: true
+        default: ""
+      mas_encryption_secret_allow_change:
+        description: Allow changing the encryption secret of an existing install, losing encrypted data
+        type: bool
+        default: false
+      mas_secrets_keys:
+        description: Override secrets.keys. Empty keeps migrated keys, or generates one RSA key.
+        type: list
+        elements: dict
+        default: []
 
       mas_psql_host:
         description: Postgres database server hostname
         type: str
-        required: false
         default: localhost
       mas_psql_port:
         description: Postgres database server port
         type: int
-        required: false
         default: 5432
       mas_psql_user:
-        description: Postgres username. Defaults to psql_dbs['mas']['user']
+        description: >
+          Postgres username. Defaults to psql_dbs['mas']['user']. When empty, the database
+          section of a migrated config is kept.
         type: str
-        required: false
       mas_psql_pw:
         description: Postgres password. Defaults to psql_dbs['mas']['password']
         type: str
-        required: false
       mas_psql_db:
-        description: Postgres database name
+        description: Postgres database name. Defaults to mas_psql_user.
         type: str
-        required: false
-        default: "{{ mas_psql_user }}"
 
-      mas_passwords_enabled:
-        description: Allow password login in MAS
-        type: bool
-        required: false
-        default: true
-      mas_password_minimum_complexity:
-        description: zxcvbn minimum password complexity (0-4)
-        type: int
-        required: false
-        default: 3
+      mas_passwords:
+        description: MAS passwords section, verbatim. Empty keeps the migrated section or MAS defaults.
+        type: dict
+        default: {}
+      mas_email:
+        description: MAS email section, verbatim. Empty keeps the migrated section or MAS defaults.
+        type: dict
+        default: {}
       mas_upstream_oauth2_providers:
-        description: List of upstream OAuth2/OIDC providers, passed verbatim to upstream_oauth2.providers
+        description: upstream_oauth2.providers, verbatim. Empty keeps migrated providers.
         type: list
         elements: dict
-        required: false
         default: []
-      mas_email:
-        description: MAS email section, passed verbatim
-        type: dict
-        required: false
       mas_extra_config:
-        description: Extra top-level MAS config keys, appended verbatim. Must not repeat keys the role already sets.
+        description: Extra MAS config, merged recursively over everything else
         type: dict
-        required: false
         default: {}
+      mas_no_log:
+        description: Hide task output containing secrets
+        type: bool
+        default: true
+
+      mas_legacy_service_names:
+        description: Unit names of a previous non-container install to stop, disable and remove
+        type: list
+        elements: str
+        default:
+          - matrix-mas.service
+          - matrix-authentication-service.service
+          - mas.service
+          - mas-cli.service
+      mas_legacy_backup_path:
+        description: Where the previous config and unit files are backed up
+        type: str
+        default: /var/backups/matrix-mas-legacy
+      mas_legacy_preserve_config:
+        description: >
+          Keep config sections of a migrated install that the role does not manage
+          (clients, upstream_oauth2, passwords, email, account, branding, policy data, ...)
+        type: bool
+        default: true

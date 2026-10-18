@@ -1,0 +1,15 @@
+---
+
+# First line of every config.yaml written by this role, used to tell it apart from a legacy config
+mas_config_marker: "# Managed by Ansible (pikaviestin.matrix.mas). Manual edits will be overwritten."
+mas_legacy_config_file: "{{ mas_config_path }}/legacy.yaml"
+# Top-level sections the role always writes itself, dropped from a migrated config.
+# templates and policy.wasm_module point at the binary's share directory, the image ships its own.
+mas_managed_sections:
+  - http
+  - matrix
+  - templates
+mas_systemd_unit_dirs:
+  - /etc/systemd/system
+  - /lib/systemd/system
+  - /usr/lib/systemd/system

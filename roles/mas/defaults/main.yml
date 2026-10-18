@@ -3,6 +3,11 @@
 mas_enabled: false
 mas_install_method: podman
 
+# Host packages: podman, plus python cryptography for community.crypto key generation
+mas_host_packages:
+  - podman
+  - python3-cryptography
+
 # Container settings
 mas_version: "1.27.0"
 mas_container_image: "ghcr.io/element-hq/matrix-authentication-service:{{ mas_version }}"
@@ -13,6 +18,8 @@ mas_container_network: host
 # UID the MAS image runs as (distroless nonroot)
 mas_container_uid: 65532
 mas_container_timeout_start_sec: 300
+# Extra "host:container[:options]" volumes, e.g. for files referenced by mas_extra_config
+mas_container_extra_volumes: []
 
 # Paths
 mas_config_path: /etc/matrix-mas
@@ -29,28 +36,48 @@ mas_trusted_proxies:
   - ::1/128
 
 # URLs
-mas_public_base: "https://{{ mas_domain }}/"
+mas_public_base: "https://{{ mas_domain | default('') }}/"
 mas_issuer: "{{ mas_public_base }}"
+# Changing the issuer of a running MAS invalidates all sessions. The role refuses unless this is true.
+mas_issuer_allow_change: false
 
 # Synapse integration
-mas_matrix_homeserver: "{{ matrix_domain }}"
+mas_matrix_homeserver: "{{ matrix_domain | default('') }}"
 mas_synapse_endpoint: http://localhost:8008/
 
-# Database
+# Secrets
+# Empty means: reuse the one from the existing config.yaml, or generate one on first install.
+mas_encryption_secret: ""
+# Changing the encryption secret makes all encrypted data unreadable. The role refuses unless this is true.
+mas_encryption_secret_allow_change: false
+# Override the signing keys (MAS secrets.keys list). Empty means: keep migrated keys, or generate one RSA key.
+mas_secrets_keys: []
+
+# Database. When mas_psql_user is empty the database section of a migrated config is kept as is.
 mas_psql_host: localhost
 mas_psql_port: 5432
-mas_psql_user: "{{ psql_dbs['mas']['user'] }}"
-mas_psql_pw: "{{ psql_dbs['mas']['password'] }}"
+mas_psql_user: "{{ psql_dbs['mas']['user'] if (psql_dbs is defined and 'mas' in psql_dbs) else '' }}"
+mas_psql_pw: "{{ psql_dbs['mas']['password'] if (psql_dbs is defined and 'mas' in psql_dbs) else '' }}"
 mas_psql_db: "{{ mas_psql_user }}"
 
-# Auth features
-mas_passwords_enabled: true
-mas_password_minimum_complexity: 3
+# Optional verbatim config sections. Empty means: keep the migrated section, or use the MAS default.
+mas_passwords: {}
+mas_email: {}
 mas_upstream_oauth2_providers: []
-mas_email:
-  from: '"Authentication Service" <noreply@{{ matrix_domain }}>'
-  reply_to: '"Authentication Service" <noreply@{{ matrix_domain }}>'
-  transport: blackhole
 
-# Any extra top-level MAS config keys, merged verbatim into config.yaml
+# Hide task output that contains secrets. Set to false to debug config validation errors.
+mas_no_log: true
+
+# Any extra top-level MAS config keys, merged recursively over everything else
 mas_extra_config: {}
+
+# Migration from a non-container (binary / systemd) MAS install
+# Unit files of a previous install that get stopped, disabled and moved to the backup path
+mas_legacy_service_names:
+  - matrix-mas.service
+  - matrix-authentication-service.service
+  - mas.service
+  - mas-cli.service
+mas_legacy_backup_path: /var/backups/matrix-mas-legacy
+# Keep config sections of the previous install that this role does not manage (clients, upstream providers, ...)
+mas_legacy_preserve_config: true

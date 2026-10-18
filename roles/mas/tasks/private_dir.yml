@@ -1,0 +1,39 @@
+---
+
+- name: Check whether the MAS private directory is a symlink
+  ansible.builtin.stat:
+    path: "{{ mas_private_path }}"
+    follow: false
+  register: mas_private_stat
+
+# The container only mounts mas_config_path, so a symlink pointing outside of it
+# would dangle inside the container. Replace it with a real directory holding copies.
+- name: Replace the MAS private directory symlink with a real directory
+  when: mas_private_stat.stat.islnk | default(false)
+  block:
+    - name: Remember the MAS private symlink target
+      ansible.builtin.set_fact:
+        mas_legacy_private_target: "{{ mas_private_stat.stat.lnk_source }}"
+
+    - name: Remove the MAS private symlink
+      ansible.builtin.file:
+        path: "{{ mas_private_path }}"
+        state: absent
+
+    - name: Copy the previous MAS private files into the config directory
+      ansible.builtin.copy:
+        src: "{{ mas_legacy_private_target }}/"
+        dest: "{{ mas_private_path }}/"
+        remote_src: true
+        owner: root
+        group: "{{ mas_container_uid }}"
+        mode: preserve
+
+    - name: Make the copied MAS private files readable by the container user only
+      ansible.builtin.file:
+        path: "{{ mas_private_path }}"
+        state: directory
+        recurse: true
+        owner: root
+        group: "{{ mas_container_uid }}"
+        mode: 'u=rwX,g=rX,o='

@@ -1,10 +1,28 @@
 ---
 
 - name: Set up matrix-authentication-service
-  when: mas_enabled
+  when: mas_enabled | bool
   block:
+    - name: Check required MAS variables
+      ansible.builtin.assert:
+        that:
+          - mas_domain is defined and mas_domain | length > 0
+          - mas_shared_secret is defined and mas_shared_secret | length > 0
+        fail_msg: mas_domain and mas_shared_secret must be set when mas_enabled is true
+        quiet: true
+
     - name: Include MAS installation tasks
       ansible.builtin.include_tasks: "install_{{ mas_install_method }}.yml"
+
+    - name: Include detection of existing MAS installs
+      ansible.builtin.import_tasks: detect.yml
+
+    - name: Include MAS private directory tasks
+      ansible.builtin.import_tasks: private_dir.yml
+
+    - name: Include migration of the previous MAS install config
+      ansible.builtin.include_tasks: migrate_prepare.yml
+      when: mas_legacy_install
 
     - name: Include MAS configuration tasks
       ansible.builtin.import_tasks: config.yml
@@ -12,10 +30,27 @@
     - name: Ensure MAS container unit in place
       ansible.builtin.template:
         src: systemd/matrix-mas.container.j2
-        dest: /etc/containers/systemd/matrix-mas.container
+        dest: "/etc/containers/systemd/{{ mas_container_name }}.container"
         owner: root
         group: root
         mode: '0644'
-      notify:
-        - Config mas service
-        - Restart mas
+      notify: Restart mas
+
+    - name: Include cutover from the previous MAS service
+      ansible.builtin.include_tasks: migrate_cutover.yml
+      when: mas_legacy_units | length > 0
+
+    - name: Ensure MAS container service is started
+      ansible.builtin.systemd:
+        name: "{{ mas_container_name }}.service"
+        state: started
+        daemon_reload: true
+
+    - name: Wait for MAS to become healthy
+      ansible.builtin.uri:
+        url: "http://{{ mas_bind_address }}:{{ mas_internal_port }}/health"
+      register: mas_health
+      until: mas_health.status == 200
+      retries: 30
+      delay: 2
+      changed_when: false

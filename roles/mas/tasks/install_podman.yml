@@ -1,9 +1,11 @@
 ---
 
-- name: Ensure podman is installed
-  ansible.builtin.package:
-    name: podman
+- name: Ensure podman and key generation dependencies are installed
+  ansible.builtin.apt:
+    name: "{{ mas_host_packages }}"
     state: present
+    update_cache: true
+    cache_valid_time: 3600
 
 - name: Get podman version
   ansible.builtin.command:

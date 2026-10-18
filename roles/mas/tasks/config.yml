@@ -16,6 +16,61 @@
     group: "{{ mas_container_uid }}"
     mode: '0750'
 
+- name: Check for preserved config of a previous MAS install
+  ansible.builtin.stat:
+    path: "{{ mas_legacy_config_file }}"
+  register: mas_legacy_config_stat
+
+- name: Read preserved config of a previous MAS install
+  ansible.builtin.slurp:
+    src: "{{ mas_legacy_config_file }}"
+  register: mas_legacy_config_slurp
+  when: mas_legacy_config_stat.stat.exists and mas_legacy_preserve_config | bool
+  no_log: "{{ mas_no_log }}"
+
+- name: Set MAS existing state facts
+  ansible.builtin.set_fact:
+    mas_preserved_config: >-
+      {{ (mas_legacy_config_slurp.content | b64decode | from_yaml)
+         if mas_legacy_config_slurp.content is defined else {} }}
+    mas_existing_encryption_secret: "{{ mas_existing_config.secrets.encryption | default('') | string | trim }}"
+    mas_existing_issuer: >-
+      {{ mas_existing_config.http.issuer | default(mas_existing_config.http.public_base | default('')) }}
+  no_log: "{{ mas_no_log }}"
+
+- name: Refuse to change the MAS issuer of an existing install
+  ansible.builtin.fail:
+    msg: >-
+      The existing MAS install uses issuer {{ mas_existing_issuer }} but mas_issuer is {{ mas_issuer }}.
+      Changing it logs everybody out and breaks clients. Set mas_issuer to the old value,
+      or set mas_issuer_allow_change to true if this is really intended.
+  when:
+    - mas_existing_issuer | length > 0
+    - mas_existing_issuer | regex_replace('/+$', '') != mas_issuer | regex_replace('/+$', '')
+    - not mas_issuer_allow_change | bool
+
+- name: Refuse to change the MAS encryption secret of an existing install
+  ansible.builtin.fail:
+    msg: >-
+      mas_encryption_secret differs from the one in the existing MAS config.
+      Changing it makes encrypted data in the database unreadable. Remove mas_encryption_secret
+      to keep the existing one, or set mas_encryption_secret_allow_change to true.
+  when:
+    - mas_encryption_secret | length > 0
+    - mas_existing_encryption_secret | length > 0
+    - mas_encryption_secret != mas_existing_encryption_secret
+    - not mas_encryption_secret_allow_change | bool
+
+- name: Set MAS effective secrets
+  ansible.builtin.set_fact:
+    mas_encryption_secret_effective: >-
+      {{ mas_encryption_secret or mas_existing_encryption_secret
+         or (lookup('ansible.builtin.password', '/dev/null', chars=['hexdigits'], length=64) | lower) }}
+    mas_secrets_keys_effective: >-
+      {{ mas_secrets_keys or (mas_preserved_config.secrets | default({})).get('keys', [])
+         or [{'kid': mas_signing_key_id, 'key_file': mas_signing_key_file}] }}
+  no_log: "{{ mas_no_log }}"
+
 - name: Ensure MAS signing key exists
   community.crypto.openssl_privatekey:
     path: "{{ mas_signing_key_file }}"
@@ -24,13 +79,36 @@
     owner: root
     group: "{{ mas_container_uid }}"
     mode: '0640'
+  when: mas_secrets_keys_effective | selectattr('key_file', 'defined')
+        | selectattr('key_file', 'equalto', mas_signing_key_file) | list | length > 0
   notify: Restart mas
 
+- name: Fail when no MAS database is configured
+  ansible.builtin.fail:
+    msg: Set mas_psql_user and mas_psql_pw, or psql_dbs['mas'], so MAS has a database.
+  when: mas_psql_user | length == 0 and mas_preserved_config.database is not defined
+
+- name: Build the MAS config
+  ansible.builtin.set_fact:
+    mas_config: >-
+      {%- set base = mas_preserved_config -%}
+      {%- if mas_psql_user | length > 0 -%}
+      {%-   set base = base | dict2items | rejectattr('key', 'equalto', 'database') | items2dict -%}
+      {%- endif -%}
+      {{ base | combine(lookup('ansible.builtin.template', 'config.yaml.j2') | from_yaml, recursive=true)
+              | combine(mas_extra_config, recursive=true) }}
+  no_log: "{{ mas_no_log }}"
+
 - name: Ensure MAS config is in place
-  ansible.builtin.template:
-    src: config.yaml.j2
+  ansible.builtin.copy:
+    content: "{{ mas_config_marker }}\n{{ mas_config | to_nice_yaml(indent=2, width=1000) }}"
     dest: "{{ mas_config_path }}/config.yaml"
     owner: root
     group: "{{ mas_container_uid }}"
     mode: '0640'
+    validate: >-
+      podman run --rm --network none --user 0 --pull never
+      -v {{ mas_config_path }}:{{ mas_config_path }}:ro -v %s:/tmp/mas-config-check.yaml:ro
+      {{ mas_container_image }} config check --config /tmp/mas-config-check.yaml
   notify: Restart mas
+  no_log: "{{ mas_no_log }}"

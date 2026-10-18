@@ -1,6 +1,5 @@
-# {{ ansible_managed }}
-# Reference: https://element-hq.github.io/matrix-authentication-service/reference/configuration.html
-
+# Sections managed by the role. Reference:
+# https://element-hq.github.io/matrix-authentication-service/reference/configuration.html
 http:
   listeners:
     - name: web
@@ -22,47 +21,38 @@ http:
         - host: {{ mas_bind_address }}
           port: {{ mas_internal_port }}
       proxy_protocol: false
-  trusted_proxies:
-{% for proxy in mas_trusted_proxies %}
-    - {{ proxy }}
-{% endfor %}
-  public_base: {{ mas_public_base }}
-  issuer: {{ mas_issuer }}
+  trusted_proxies: {{ mas_trusted_proxies | to_json }}
+  public_base: {{ mas_public_base | to_json }}
+  issuer: {{ mas_issuer | to_json }}
+{% if mas_psql_user | length > 0 %}
 
 database:
-  host: {{ mas_psql_host }}
+  host: {{ mas_psql_host | to_json }}
   port: {{ mas_psql_port }}
-  username: {{ mas_psql_user }}
-  password: {{ mas_psql_pw }}
-  database: {{ mas_psql_db }}
+  username: {{ mas_psql_user | to_json }}
+  password: {{ mas_psql_pw | to_json }}
+  database: {{ mas_psql_db | to_json }}
+{% endif %}
 
-email:
-{{ mas_email | to_nice_yaml(indent=2) | indent(2, first=true) }}
 secrets:
-  encryption: {{ mas_encryption_secret }}
-  keys:
-    - kid: {{ mas_signing_key_id }}
-      key_file: {{ mas_signing_key_file }}
-
-passwords:
-  enabled: {{ mas_passwords_enabled | bool | lower }}
-  schemes:
-    - version: 1
-      algorithm: argon2id
-  minimum_complexity: {{ mas_password_minimum_complexity }}
+  encryption: {{ mas_encryption_secret_effective | to_json }}
+  keys: {{ mas_secrets_keys_effective | to_json }}
 
 matrix:
   kind: synapse
-  homeserver: {{ mas_matrix_homeserver }}
-  secret: {{ mas_shared_secret }}
-  endpoint: {{ mas_synapse_endpoint }}
+  homeserver: {{ mas_matrix_homeserver | to_json }}
+  secret: {{ mas_shared_secret | to_json }}
+  endpoint: {{ mas_synapse_endpoint | to_json }}
+{% if mas_passwords | length > 0 %}
+
+passwords: {{ mas_passwords | to_json }}
+{% endif %}
+{% if mas_email | length > 0 %}
+
+email: {{ mas_email | to_json }}
+{% endif %}
 {% if mas_upstream_oauth2_providers | length > 0 %}
 
 upstream_oauth2:
-  providers:
-{{ mas_upstream_oauth2_providers | to_nice_yaml(indent=2) | indent(4, first=true) }}
-{% endif %}
-{% if mas_extra_config | length > 0 %}
-
-{{ mas_extra_config | to_nice_yaml(indent=2) }}
+  providers: {{ mas_upstream_oauth2_providers | to_json }}
 {% endif %}

@@ -1,0 +1,50 @@
+---
+
+- name: Stop and disable the previous MAS services
+  ansible.builtin.systemd:
+    name: "{{ item | basename }}"
+    state: stopped
+    enabled: false
+  loop: "{{ mas_legacy_units }}"
+
+- name: Back up unit files of the previous MAS install
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ mas_legacy_backup_path }}/{{ item | basename }}"
+    remote_src: true
+    force: false
+    owner: root
+    group: root
+    mode: '0600'
+  loop: "{{ mas_legacy_units }}"
+
+- name: Check for drop-in directories of the previous MAS units
+  ansible.builtin.stat:
+    path: "{{ item }}.d"
+  loop: "{{ mas_legacy_units }}"
+  register: mas_legacy_dropin_stats
+
+- name: Back up drop-in directories of the previous MAS units
+  ansible.builtin.copy:
+    src: "{{ item.stat.path }}"
+    dest: "{{ mas_legacy_backup_path }}/"
+    remote_src: true
+    force: false
+    owner: root
+    group: root
+    mode: preserve
+  loop: "{{ mas_legacy_dropin_stats.results | selectattr('stat.exists') | list }}"
+  loop_control:
+    label: "{{ item.stat.path }}"
+
+# A unit file in /etc/systemd/system with the same name would shadow the
+# unit quadlet generates, so the old units have to go, including drop-ins.
+- name: Remove unit files of the previous MAS install
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ mas_legacy_units + (mas_legacy_units | map('regex_replace', '$', '.d') | list) }}"
+
+- name: Reload systemd after removing the previous MAS units
+  ansible.builtin.systemd:
+    daemon_reload: true
