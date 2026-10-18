@@ -1,0 +1,32 @@
+---
+
+- name: Ensure matrix-mas config directory exists
+  ansible.builtin.file:
+    path: /etc/matrix-mas
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure matrix-mas var directory exists
+  ansible.builtin.file:
+    path: /var/lib/matrix-mas
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure matrix-mas private directory exists
+  ansible.builtin.file:
+    path: /var/lib/matrix-mas/private
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+
+- name: Create symlink from /etc/matrix-mas to /var/lib/matrix-mas/private
+  ansible.builtin.file:
+    src: /var/lib/matrix-mas/private
+    dest: /etc/matrix-mas/private
+    state: link
+    force: true

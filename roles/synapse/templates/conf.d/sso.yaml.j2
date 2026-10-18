@@ -3,6 +3,17 @@
 password_config:
   enabled: false
 
+{% if mas_enabled %}
+matrix_authentication_service:
+  # Enable the MAS integration
+   enabled: true
+  # The base URL where Synapse will contact MAS
+   endpoint: http://localhost:"{{ mas_port | default(8007) }}"
+  # The shared secret used to authenticate MAS requests, must be the same as `matrix.secret` in the MAS configuration
+  # See https://element-hq.github.io/matrix-authentication-service/reference/configuration.html#matrix
+   secret: {{ mas_shared_secret }}
+{% endif %}
+
 {% if synapse_sso_client_whitelist is defined %}
 sso:
   client_whitelist:
