@@ -1,5 +1,21 @@
 ---
 
-- name: Include matrix-mas configuration tasks
-  ansible.builtin.import_tasks: config.yml
+- name: Set up matrix-authentication-service
+  when: mas_enabled
+  block:
+    - name: Include MAS installation tasks
+      ansible.builtin.include_tasks: "install_{{ mas_install_method }}.yml"
 
+    - name: Include MAS configuration tasks
+      ansible.builtin.import_tasks: config.yml
+
+    - name: Ensure MAS container unit in place
+      ansible.builtin.template:
+        src: systemd/matrix-mas.container.j2
+        dest: /etc/containers/systemd/matrix-mas.container
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - Config mas service
+        - Restart mas

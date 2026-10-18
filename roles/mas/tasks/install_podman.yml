@@ -1,0 +1,30 @@
+---
+
+- name: Ensure podman is installed
+  ansible.builtin.package:
+    name: podman
+    state: present
+
+- name: Get podman version
+  ansible.builtin.command:
+    cmd: podman version --format '{{ "{{" }}.Client.Version{{ "}}" }}'
+  register: mas_podman_version
+  changed_when: false
+
+- name: Ensure podman supports quadlet units
+  ansible.builtin.assert:
+    that: mas_podman_version.stdout is version('4.4', '>=')
+    fail_msg: "podman {{ mas_podman_version.stdout }} found, quadlet needs podman >= 4.4"
+
+- name: Ensure quadlet directory exists
+  ansible.builtin.file:
+    path: /etc/containers/systemd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Ensure MAS container image is present
+  containers.podman.podman_image:
+    name: "{{ mas_container_image }}"
+  notify: Restart mas

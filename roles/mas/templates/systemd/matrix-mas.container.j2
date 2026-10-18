@@ -1,0 +1,22 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=Matrix Authentication Service
+PartOf=matrix.target
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+ContainerName={{ mas_container_name }}
+Image={{ mas_container_image }}
+Network={{ mas_container_network }}
+Volume={{ mas_config_path }}:{{ mas_config_path }}:ro
+Exec=server --config {{ mas_config_path }}/config.yaml
+
+[Service]
+Restart=always
+RestartSec=3
+TimeoutStartSec={{ mas_container_timeout_start_sec }}
+
+[Install]
+WantedBy=matrix.target

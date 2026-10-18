@@ -1,32 +1,36 @@
 ---
 
-- name: Ensure matrix-mas config directory exists
+- name: Ensure MAS config directory exists
   ansible.builtin.file:
-    path: /etc/matrix-mas
+    path: "{{ mas_config_path }}"
     state: directory
     owner: root
-    group: root
-    mode: '0755'
+    group: "{{ mas_container_uid }}"
+    mode: '0750'
 
-- name: Ensure matrix-mas var directory exists
+- name: Ensure MAS private directory exists
   ansible.builtin.file:
-    path: /var/lib/matrix-mas
+    path: "{{ mas_private_path }}"
     state: directory
     owner: root
-    group: root
-    mode: '0755'
+    group: "{{ mas_container_uid }}"
+    mode: '0750'
 
-- name: Ensure matrix-mas private directory exists
-  ansible.builtin.file:
-    path: /var/lib/matrix-mas/private
-    state: directory
+- name: Ensure MAS signing key exists
+  community.crypto.openssl_privatekey:
+    path: "{{ mas_signing_key_file }}"
+    type: RSA
+    size: 2048
     owner: root
-    group: root
-    mode: '0700'
+    group: "{{ mas_container_uid }}"
+    mode: '0640'
+  notify: Restart mas
 
-- name: Create symlink from /etc/matrix-mas to /var/lib/matrix-mas/private
-  ansible.builtin.file:
-    src: /var/lib/matrix-mas/private
-    dest: /etc/matrix-mas/private
-    state: link
-    force: true
+- name: Ensure MAS config is in place
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: "{{ mas_config_path }}/config.yaml"
+    owner: root
+    group: "{{ mas_container_uid }}"
+    mode: '0640'
+  notify: Restart mas

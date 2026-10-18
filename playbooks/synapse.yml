@@ -8,5 +8,6 @@
     - vars/nginx.yml
   roles:
     - synapse
+    - mas
     - draupnir
     - nginx

@@ -1,0 +1,10 @@
+---
+
+- name: Config mas service
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart mas
+  ansible.builtin.systemd:
+    name: "{{ mas_container_name }}.service"
+    state: restarted

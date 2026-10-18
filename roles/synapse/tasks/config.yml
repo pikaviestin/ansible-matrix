@@ -61,7 +61,7 @@
     owner: matrix-synapse
     group: nogroup
     mode: '0644'
-  when: matrix_openidc_providers is defined
+  when: matrix_openidc_providers is defined or mas_enabled | default(false)
   notify: Config matrix target
 
 - name: Ensure turn config is in place

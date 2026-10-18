@@ -1,0 +1,68 @@
+# {{ ansible_managed }}
+# Reference: https://element-hq.github.io/matrix-authentication-service/reference/configuration.html
+
+http:
+  listeners:
+    - name: web
+      resources:
+        - name: discovery
+        - name: human
+        - name: oauth
+        - name: compat
+        - name: graphql
+        - name: assets
+      binds:
+        - host: {{ mas_bind_address }}
+          port: {{ mas_port }}
+      proxy_protocol: false
+    - name: internal
+      resources:
+        - name: health
+      binds:
+        - host: {{ mas_bind_address }}
+          port: {{ mas_internal_port }}
+      proxy_protocol: false
+  trusted_proxies:
+{% for proxy in mas_trusted_proxies %}
+    - {{ proxy }}
+{% endfor %}
+  public_base: {{ mas_public_base }}
+  issuer: {{ mas_issuer }}
+
+database:
+  host: {{ mas_psql_host }}
+  port: {{ mas_psql_port }}
+  username: {{ mas_psql_user }}
+  password: {{ mas_psql_pw }}
+  database: {{ mas_psql_db }}
+
+email:
+{{ mas_email | to_nice_yaml(indent=2) | indent(2, first=true) }}
+secrets:
+  encryption: {{ mas_encryption_secret }}
+  keys:
+    - kid: {{ mas_signing_key_id }}
+      key_file: {{ mas_signing_key_file }}
+
+passwords:
+  enabled: {{ mas_passwords_enabled | bool | lower }}
+  schemes:
+    - version: 1
+      algorithm: argon2id
+  minimum_complexity: {{ mas_password_minimum_complexity }}
+
+matrix:
+  kind: synapse
+  homeserver: {{ mas_matrix_homeserver }}
+  secret: {{ mas_shared_secret }}
+  endpoint: {{ mas_synapse_endpoint }}
+{% if mas_upstream_oauth2_providers | length > 0 %}
+
+upstream_oauth2:
+  providers:
+{{ mas_upstream_oauth2_providers | to_nice_yaml(indent=2) | indent(4, first=true) }}
+{% endif %}
+{% if mas_extra_config | length > 0 %}
+
+{{ mas_extra_config | to_nice_yaml(indent=2) }}
+{% endif %}

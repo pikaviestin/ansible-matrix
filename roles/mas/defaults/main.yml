@@ -1,1 +1,56 @@
+---
+
 mas_enabled: false
+mas_install_method: podman
+
+# Container settings
+mas_version: "1.27.0"
+mas_container_image: "ghcr.io/element-hq/matrix-authentication-service:{{ mas_version }}"
+mas_container_name: matrix-mas
+# host networking keeps MAS reachable on localhost for synapse and nginx,
+# and lets MAS reach synapse and postgres on localhost
+mas_container_network: host
+# UID the MAS image runs as (distroless nonroot)
+mas_container_uid: 65532
+mas_container_timeout_start_sec: 300
+
+# Paths
+mas_config_path: /etc/matrix-mas
+mas_private_path: "{{ mas_config_path }}/private"
+mas_signing_key_file: "{{ mas_private_path }}/signing.key"
+mas_signing_key_id: rsa-01
+
+# Listeners
+mas_bind_address: 127.0.0.1
+mas_port: 8007
+mas_internal_port: 8081
+mas_trusted_proxies:
+  - 127.0.0.1/8
+  - ::1/128
+
+# URLs
+mas_public_base: "https://{{ mas_domain }}/"
+mas_issuer: "{{ mas_public_base }}"
+
+# Synapse integration
+mas_matrix_homeserver: "{{ matrix_domain }}"
+mas_synapse_endpoint: http://localhost:8008/
+
+# Database
+mas_psql_host: localhost
+mas_psql_port: 5432
+mas_psql_user: "{{ psql_dbs['mas']['user'] }}"
+mas_psql_pw: "{{ psql_dbs['mas']['password'] }}"
+mas_psql_db: "{{ mas_psql_user }}"
+
+# Auth features
+mas_passwords_enabled: true
+mas_password_minimum_complexity: 3
+mas_upstream_oauth2_providers: []
+mas_email:
+  from: '"Authentication Service" <noreply@{{ matrix_domain }}>'
+  reply_to: '"Authentication Service" <noreply@{{ matrix_domain }}>'
+  transport: blackhole
+
+# Any extra top-level MAS config keys, merged verbatim into config.yaml
+mas_extra_config: {}

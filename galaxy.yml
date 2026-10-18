@@ -2,10 +2,15 @@
 namespace: pikaviestin
 name: matrix
 description: Matrix roles
-version: 0.4.2
+version: 0.5.0
 readme: README.md
 repository: https://github.com/pikaviestin/ansible-matrix
 license_file: LICENSE
+tags:
+  - application
+dependencies:
+  community.crypto: ">=2.0.0"
+  containers.podman: ">=1.10.0"
 authors:
   - uumas
   - samip5

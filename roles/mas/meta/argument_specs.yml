@@ -1,0 +1,174 @@
+---
+
+argument_specs:
+  main:
+    short_description: Matrix Authentication Service (MAS)
+    description: >
+      Installs and configures matrix-authentication-service as a podman container
+      managed by systemd (quadlet), and generates its configuration.
+    options:
+      mas_enabled:
+        description: Whether to deploy MAS at all. The role does nothing when false.
+        type: bool
+        required: false
+        default: false
+      mas_install_method:
+        description: Installation method
+        type: str
+        required: false
+        default: podman
+        choices:
+          - podman
+
+      mas_domain:
+        description: Public hostname MAS is served on (e.g. auth.example.org)
+        type: str
+        required: true
+      mas_public_base:
+        description: Public base URL of MAS
+        type: str
+        required: false
+        default: "https://{{ mas_domain }}/"
+      mas_issuer:
+        description: OIDC issuer URL. Changing it after first start breaks existing sessions.
+        type: str
+        required: false
+        default: "{{ mas_public_base }}"
+
+      mas_version:
+        description: MAS release to run
+        type: str
+        required: false
+        default: "1.27.0"
+      mas_container_image:
+        description: Container image to run
+        type: str
+        required: false
+        default: "ghcr.io/element-hq/matrix-authentication-service:{{ mas_version }}"
+      mas_container_name:
+        description: Container and systemd unit name
+        type: str
+        required: false
+        default: matrix-mas
+      mas_container_network:
+        description: Podman network mode for the container
+        type: str
+        required: false
+        default: host
+      mas_container_uid:
+        description: UID the image runs as, used to make config files readable inside the container
+        type: int
+        required: false
+        default: 65532
+      mas_container_timeout_start_sec:
+        description: systemd TimeoutStartSec for the container (covers image pull)
+        type: int
+        required: false
+        default: 300
+
+      mas_config_path:
+        description: Directory for MAS configuration, bind mounted into the container
+        type: str
+        required: false
+        default: /etc/matrix-mas
+      mas_signing_key_file:
+        description: Path of the RSA signing key, generated if missing
+        type: str
+        required: false
+        default: "{{ mas_config_path }}/private/signing.key"
+      mas_signing_key_id:
+        description: Key id (kid) of the signing key
+        type: str
+        required: false
+        default: rsa-01
+
+      mas_bind_address:
+        description: Address MAS listeners bind to
+        type: str
+        required: false
+        default: 127.0.0.1
+      mas_port:
+        description: Port for the public MAS listener, proxied by nginx
+        type: int
+        required: false
+        default: 8007
+      mas_internal_port:
+        description: Port for the internal health listener
+        type: int
+        required: false
+        default: 8081
+      mas_trusted_proxies:
+        description: Reverse proxies whose X-Forwarded-For is trusted
+        type: list
+        elements: str
+        required: false
+        default: ["127.0.0.1/8", "::1/128"]
+
+      mas_matrix_homeserver:
+        description: Matrix server name
+        type: str
+        required: false
+        default: "{{ matrix_domain }}"
+      mas_synapse_endpoint:
+        description: URL MAS uses to reach synapse
+        type: str
+        required: false
+        default: http://localhost:8008/
+      mas_shared_secret:
+        description: Secret shared between MAS and synapse (matrix_authentication_service.secret in synapse)
+        type: str
+        required: true
+      mas_encryption_secret:
+        description: 32 byte hex encoded encryption secret (secrets.encryption). Must never change.
+        type: str
+        required: true
+
+      mas_psql_host:
+        description: Postgres database server hostname
+        type: str
+        required: false
+        default: localhost
+      mas_psql_port:
+        description: Postgres database server port
+        type: int
+        required: false
+        default: 5432
+      mas_psql_user:
+        description: Postgres username. Defaults to psql_dbs['mas']['user']
+        type: str
+        required: false
+      mas_psql_pw:
+        description: Postgres password. Defaults to psql_dbs['mas']['password']
+        type: str
+        required: false
+      mas_psql_db:
+        description: Postgres database name
+        type: str
+        required: false
+        default: "{{ mas_psql_user }}"
+
+      mas_passwords_enabled:
+        description: Allow password login in MAS
+        type: bool
+        required: false
+        default: true
+      mas_password_minimum_complexity:
+        description: zxcvbn minimum password complexity (0-4)
+        type: int
+        required: false
+        default: 3
+      mas_upstream_oauth2_providers:
+        description: List of upstream OAuth2/OIDC providers, passed verbatim to upstream_oauth2.providers
+        type: list
+        elements: dict
+        required: false
+        default: []
+      mas_email:
+        description: MAS email section, passed verbatim
+        type: dict
+        required: false
+      mas_extra_config:
+        description: Extra top-level MAS config keys, appended verbatim. Must not repeat keys the role already sets.
+        type: dict
+        required: false
+        default: {}
